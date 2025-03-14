@@ -37,3 +37,12 @@ mp.events.add('playerExitCarMarket', (player: PlayerMp, carMarket: CarMarket) =>
   carMarket.exit(player)
 	player.outputChatBox(`You leaved the CARMARKET zone`);
 });
+
+// Event which will be called from client when the vehicle streams in
+mp.events.add('server::vehicleStreamIn', async (_player, remoteid) => {
+	const vehicle = mp.vehicles.at(remoteid);
+
+	if (!vehicle || !mp.vehicles.exists(vehicle)) return;
+	if (!vehicle.onStreamIn || typeof vehicle.onStreamIn === 'undefined') return;
+	vehicle.onStreamIn.constructor.name === 'AsyncFunction' ? await vehicle.onStreamIn(vehicle) : vehicle.onStreamIn(vehicle);
+});
