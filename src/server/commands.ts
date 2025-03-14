@@ -1,4 +1,5 @@
 ﻿import { VEHICLE_NAMES } from '@shared/constants';
+import CarMarket, { carMarkets } from "./carMarket";
 
 mp.events.addCommand("spawncar", (player, carName = "") => {  
   if (!Object.keys(VEHICLE_NAMES).includes(carName)) {
@@ -36,6 +37,51 @@ mp.events.addCommand("addcolshape", (player, dimensions: string) => {
   );
 })
 
+mp.events.addCommand("addcarmarket", (player, dimensions: string) => {
+  if (!dimensions || dimensions.split(" ").length < 3) {
+    return player.outputChatBox(`Bad dimensions`)
+  }
+  const [width, height, depth] = dimensions.split(" ").map((_) => {return Number(_)})
+
+  const shape = mp.colshapes.newCuboid(
+    player.position.x, // X-Координаты центра
+    player.position.y, // Y-Координаты центра
+    player.position.z, // Z-Координаты центра
+    depth,  // Длина
+    width,  // Ширина
+    height, // Высота
+    player.dimension
+  );
+
+  const carMarket = new CarMarket(shape, [
+    mp.markers.new(
+      1, 
+      new mp.Vector3(player.position.x, player.position.y, player.position.z), 
+      1, 
+      {
+      color: [255, 0, 0, 100], // Красный цвет
+      visible: false // Скрыт по умолчанию
+    }),
+    mp.markers.new(
+      1, 
+      new mp.Vector3(player.position.x -1, player.position.y -1, player.position.z), 
+      1, 
+      {
+      color: [0, 0, 255, 100], // Красный цвет
+      visible: false // Скрыт по умолчанию
+    }),
+    mp.markers.new(
+      1, 
+      new mp.Vector3(player.position.x +1, player.position.y +1, player.position.z), 
+      1, 
+      {
+      color: [0, 255, 0, 100], // Красный цвет
+      visible: false // Скрыт по умолчанию
+    })
+  ])
+  
+  carMarkets.push(carMarket)
+})
 
 mp.events.addCommand("rmcolshape", (player, fullText) => {
   if (!fullText || isNaN(Number(fullText))) {
