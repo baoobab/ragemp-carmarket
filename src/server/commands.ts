@@ -1,7 +1,14 @@
 ﻿import { VEHICLE_NAMES } from '@shared/constants';
 import CarMarket, { carMarkets } from "./carMarket";
 
-mp.events.addCommand("spawncar", (player, carName = "") => {  
+
+/**
+ * Command to spawn a vehicle.
+ * 
+ * @param player The player who invoked the command.
+ * @param carName The name of the vehicle to spawn. One of: VEHICLE_NAMES
+ */
+mp.events.addCommand("spawncar", (player: PlayerMp, carName = "") => {  
   if (!Object.keys(VEHICLE_NAMES).includes(carName)) {
     return player.outputChatBox('No such vehicle');
   }
@@ -20,36 +27,48 @@ mp.events.addCommand("spawncar", (player, carName = "") => {
 
 })
 
-mp.events.addCommand("addcolshape", (player, dimensions: string) => {
+/**
+ * Command to create a new cuboid colshape.
+ * 
+ * @param player The player who invoked the command.
+ * @param dimensions The dimensions of the colshape in the format "width height depth".
+ */
+mp.events.addCommand("addcolshape", (player: PlayerMp, dimensions: string) => {
   if (!dimensions || dimensions.split(" ").length < 3) {
     return player.outputChatBox(`Bad dimensions`)
   }
   const [width, height, depth] = dimensions.split(" ").map((_) => {return Number(_)})
 
   mp.colshapes.newCuboid(
-    player.position.x, // X-Координаты центра
-    player.position.y, // Y-Координаты центра
-    player.position.z, // Z-Координаты центра
-    depth,  // Длина
-    width,  // Ширина
-    height, // Высота
+    player.position.x, // center X-coords
+    player.position.y, // center Y-coords
+    player.position.z, // center Z-coords
+    depth,
+    width,
+    height,
     player.dimension
   );
 })
 
-mp.events.addCommand("addcarmarket", (player, dimensions: string) => {
+/**
+ * Command to create a new car market.
+ * 
+ * @param player The player who invoked the command.
+ * @param dimensions The dimensions of the colshape in the format "width height depth".
+ */
+mp.events.addCommand("addcarmarket", (player: PlayerMp, dimensions: string) => {
   if (!dimensions || dimensions.split(" ").length < 3) {
     return player.outputChatBox(`Bad dimensions`)
   }
   const [width, height, depth] = dimensions.split(" ").map((_) => {return Number(_)})
 
   const shape = mp.colshapes.newCuboid(
-    player.position.x, // X-Координаты центра
-    player.position.y, // Y-Координаты центра
-    player.position.z, // Z-Координаты центра
-    depth,  // Длина
-    width,  // Ширина
-    height, // Высота
+    player.position.x, // center X-coords
+    player.position.y, // center Y-coords
+    player.position.z, // center Z-coords
+    depth,
+    width,
+    height,
     player.dimension
   );
 
@@ -59,30 +78,36 @@ mp.events.addCommand("addcarmarket", (player, dimensions: string) => {
       new mp.Vector3(player.position.x, player.position.y, player.position.z), 
       1, 
       {
-      color: [255, 0, 0, 100], // Красный цвет
-      visible: false // Скрыт по умолчанию
+      color: [255, 0, 0, 100], // Red color
+      visible: false // Default hidden
     }),
     mp.markers.new(
       1, 
       new mp.Vector3(player.position.x -1, player.position.y -1, player.position.z), 
       1, 
       {
-      color: [0, 0, 255, 100], // Красный цвет
-      visible: false // Скрыт по умолчанию
+      color: [0, 0, 255, 100], // Blue color
+      visible: false // Default hidden
     }),
     mp.markers.new(
       1, 
       new mp.Vector3(player.position.x +1, player.position.y +1, player.position.z), 
       1, 
       {
-      color: [0, 255, 0, 100], // Красный цвет
-      visible: false // Скрыт по умолчанию
+      color: [0, 255, 0, 100], // Green color
+      visible: false // Default hidden
     })
   ])
   
   carMarkets.push(carMarket)
 })
 
+/**
+ * Command to remove colshape by id.
+ * 
+ * @param player The player who invoked the command.
+ * @param shapeId The id of shape.
+ */
 mp.events.addCommand("rmcolshape", (player, fullText) => {
   if (!fullText || isNaN(Number(fullText))) {
     return player.outputChatBox(`Bad input`)
@@ -104,12 +129,3 @@ mp.events.addCommand("rmcolshape", (player, fullText) => {
 
   return player.outputChatBox(`Colshape not found`)
 })
-
-// Adding a event which will be called from client when the vehicle streams in
-mp.events.add('server::vehicleStreamIn', async (_player, remoteid) => {
-	const vehicle = mp.vehicles.at(remoteid);
-
-	if (!vehicle || !mp.vehicles.exists(vehicle)) return;
-	if (!vehicle.onStreamIn || typeof vehicle.onStreamIn === 'undefined') return;
-	vehicle.onStreamIn.constructor.name === 'AsyncFunction' ? await vehicle.onStreamIn(vehicle) : vehicle.onStreamIn(vehicle);
-});
