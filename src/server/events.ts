@@ -34,6 +34,6 @@ mp.events.add('playerEnterCarMarket', (player: PlayerMp, carMarket: CarMarket) =
 mp.events.add('playerExitCarMarket', (player: PlayerMp, carMarket: CarMarket) => {
 	if (!carMarket) return;
 
-  carMarket.leave(player)
+  carMarket.exit(player)
 	player.outputChatBox(`You leaved the CARMARKET zone`);
 });
