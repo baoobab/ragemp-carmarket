@@ -1,6 +1,5 @@
 ﻿import { VEHICLE_NAMES } from '@shared/constants';
 
-
 mp.events.addCommand("spawncar", (player, carName = "") => {  
   if (!Object.keys(VEHICLE_NAMES).includes(carName)) {
     return player.outputChatBox('No such vehicle');
@@ -22,7 +21,7 @@ mp.events.addCommand("spawncar", (player, carName = "") => {
 
 mp.events.addCommand("addcolshape", (player, dimensions: string) => {
   if (!dimensions || dimensions.split(" ").length < 3) {
-    return player.outputChatBox(`Bad dimensions ${dimensions}`)
+    return player.outputChatBox(`Bad dimensions`)
   }
   const [width, height, depth] = dimensions.split(" ").map((_) => {return Number(_)})
 
@@ -30,12 +29,13 @@ mp.events.addCommand("addcolshape", (player, dimensions: string) => {
     player.position.x, // X-Координаты центра
     player.position.y, // Y-Координаты центра
     player.position.z, // Z-Координаты центра
-    depth, // Длина
-    width, // Ширина
-    height // Высота
+    depth,  // Длина
+    width,  // Ширина
+    height, // Высота
+    player.dimension
   );
-
 })
+
 
 mp.events.addCommand("rmcolshape", (player, fullText) => {
   if (!fullText || isNaN(Number(fullText))) {
