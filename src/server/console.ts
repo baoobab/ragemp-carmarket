@@ -49,7 +49,7 @@ mp.events.add("console:heal", (playerId) => {
   console.log(`Player ${player.name} was healed`);
 });
 
-mp.events.add("console:players", (args) => {
+mp.events.add("console:players", () => {
   let count = 0;
   console.log('Players online:');
 

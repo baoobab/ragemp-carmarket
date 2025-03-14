@@ -21,7 +21,7 @@ mp.events.addCommand("spawncar", (player, carName = "") => {
 })
 
 //Adding a event which will be called from client when the vehicle streams in
-mp.events.add('server::vehicleStreamIn', async (player, remoteid) => {
+mp.events.add('server::vehicleStreamIn', async (_player, remoteid) => {
 	const vehicle = mp.vehicles.at(remoteid);
 
 	if (!vehicle || !mp.vehicles.exists(vehicle)) return;
