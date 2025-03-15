@@ -2,8 +2,11 @@
   private _colshape: ColshapeMp;
   private _sellPoints: MarkerMp[];
 
-  private _onExit: (player: PlayerMp) => void;
-  private _onEnter: (player: PlayerMp) => void;
+  // signal, which calls when player exits the CarMarket zone. Default is undefined
+  private _onExit: ((player: PlayerMp) => void) | undefined;
+
+  // signal, which calls when player enters the CarMarket zone. Default is undefined
+  private _onEnter: ((player: PlayerMp) => void) | undefined;
 
   constructor(colshape: ColshapeMp, sellPoints: MarkerMp[]) {
     this._colshape = colshape
