@@ -1,9 +1,10 @@
 ﻿import { Dimensions } from "@shared/constants";
+import InfoMarker from "./info-marker";
 
 export default class CarMarket {
   private _colshape: ColshapeMp; // CarMarket zone
   private _sellPoints: MarkerMp[] = []; // Points where player can sell/buy a vehicle
-  private _enterPoint: MarkerMp; // Enter point to CarMarket, shows info
+  private _enterPoint: InfoMarker; // Enter point to CarMarket, shows info
 
   // signal, which calls when player exits the CarMarket zone. Default is undefined
   private _onExit: ((player: PlayerMp) => void) | undefined;
@@ -77,14 +78,15 @@ export default class CarMarket {
     }
 
     // Placing the enter point to CarMarket (on the last side of rectangle)
-    this._enterPoint = mp.markers.new(
-      1,
+    this._enterPoint = new InfoMarker(
       new mp.Vector3(position.x, position.y - dimensions.depth/2, position.z),
-      1,
-      { color: [0, 255, 255, 150], dimension: dimension }
-    );
+      0,
+      [0, 255, 255, 150],
+      `Car Market`,
+      dimension
+    )
+    this._enterPoint.label = "bebra"
   }
-
   
   public get colshape() : ColshapeMp {
     return this._colshape
