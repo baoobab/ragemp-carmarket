@@ -1,10 +1,8 @@
 declare global {
 	interface PlayerMp {
-		customProperty: number;
-
-		customMethod(): void;
+		ownVehicles: VehicleMp[]; // vehicles in ownership
 	}
-
+  
 	interface VehicleMp {
 		onStreamIn(vehicle: VehicleMp): void;
 	}

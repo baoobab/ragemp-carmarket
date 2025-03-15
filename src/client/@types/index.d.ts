@@ -1,8 +1,6 @@
 declare global {
-	interface PlayerMp {
-		customProperty: number;
-
-		customMethod(): void;
+  interface PlayerMp {
+		ownVehicles: VehicleMp[]; // vehicles in ownership
 	}
 }
 
