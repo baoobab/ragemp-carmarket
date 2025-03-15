@@ -1,5 +1,6 @@
 ﻿import { VEHICLE_NAMES } from '@shared/constants';
-import CarMarket, { carMarkets } from "./car-market";
+import CarMarket from "./car-market";
+import { carMarketsPool } from './custom-pools'
 
 
 /**
@@ -99,7 +100,7 @@ mp.events.addCommand("addcarmarket", (player: PlayerMp, dimensions: string) => {
     })
   ])
   
-  carMarkets.push(carMarket)
+  carMarketsPool.push(carMarket)
 })
 
 /**
