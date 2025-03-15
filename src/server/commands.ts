@@ -1,4 +1,4 @@
-﻿import { VEHICLE_NAMES } from '@shared/constants';
+﻿import { VEHICLE_NAMES, Dimensions } from '@shared/constants';
 import CarMarket from "./car-market";
 import { carMarketsPool } from './custom-pools'
 
@@ -34,19 +34,21 @@ mp.events.addCommand("spawncar", (player: PlayerMp, carName = "") => {
  * @param player The player who invoked the command.
  * @param dimensions The dimensions of the colshape in the format "width height depth".
  */
-mp.events.addCommand("addcolshape", (player: PlayerMp, dimensions: string) => {
-  if (!dimensions || dimensions.split(" ").length < 3) {
+mp.events.addCommand("addcolshape", (player: PlayerMp, fullText: string) => {
+  if (!fullText || fullText.split(" ").length < 3) {
     return player.outputChatBox(`Bad dimensions`)
   }
-  const [width, height, depth] = dimensions.split(" ").map((_) => {return Number(_)})
+
+  const rawDimensions = fullText.split(" ").map((_) => {return Number(_)})
+  const dimensions: Dimensions.Cuboid = {width: rawDimensions[0], depth: rawDimensions[1], height: rawDimensions[2]}
 
   mp.colshapes.newCuboid(
     player.position.x, // center X-coords
     player.position.y, // center Y-coords
     player.position.z, // center Z-coords
-    depth,
-    width,
-    height,
+    dimensions.width,
+    dimensions.depth,
+    dimensions.height,
     player.dimension
   );
 })
@@ -57,48 +59,15 @@ mp.events.addCommand("addcolshape", (player: PlayerMp, dimensions: string) => {
  * @param player The player who invoked the command.
  * @param dimensions The dimensions of the colshape in the format "width height depth".
  */
-mp.events.addCommand("addcarmarket", (player: PlayerMp, dimensions: string) => {
-  if (!dimensions || dimensions.split(" ").length < 3) {
+mp.events.addCommand("addcarmarket", (player: PlayerMp, fullText: string) => {
+  if (!fullText || fullText.split(" ").length < 3) {
     return player.outputChatBox(`Bad dimensions`)
   }
-  const [width, height, depth] = dimensions.split(" ").map((_) => {return Number(_)})
 
-  const shape = mp.colshapes.newCuboid(
-    player.position.x, // center X-coords
-    player.position.y, // center Y-coords
-    player.position.z, // center Z-coords
-    depth,
-    width,
-    height,
-    player.dimension
-  );
+  const rawDimensions = fullText.split(" ").map((_) => {return Number(_)})
+  const dimensions: Dimensions.Cuboid = {width: rawDimensions[0], depth: rawDimensions[1], height: rawDimensions[2]}
 
-  const carMarket = new CarMarket(shape, [
-    mp.markers.new(
-      1, 
-      new mp.Vector3(player.position.x, player.position.y, player.position.z), 
-      1, 
-      {
-      color: [255, 0, 0, 100], // Red color
-      visible: false // Default hidden
-    }),
-    mp.markers.new(
-      1, 
-      new mp.Vector3(player.position.x -1, player.position.y -1, player.position.z), 
-      1, 
-      {
-      color: [0, 0, 255, 100], // Blue color
-      visible: false // Default hidden
-    }),
-    mp.markers.new(
-      1, 
-      new mp.Vector3(player.position.x +1, player.position.y +1, player.position.z), 
-      1, 
-      {
-      color: [0, 255, 0, 100], // Green color
-      visible: false // Default hidden
-    })
-  ])
+  const carMarket = new CarMarket(player.position, dimensions, player.dimension)
   
   carMarketsPool.push(carMarket)
 })
