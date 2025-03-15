@@ -1,6 +1,10 @@
-export const SHARED_CONSTANTS = {
-	HELLO_WORLD: 'HELLO WORLD!'
-};
+export namespace Dimensions {
+  export interface Cuboid {
+    width: number;
+    depth: number;
+    height: number;
+  }
+}
 
 export const SPAWNPOINTS = {
   "SpawnPoints": [
