@@ -1,5 +1,7 @@
 ﻿import { SPAWNPOINTS } from '@shared/constants';
-import CarMarket, { carMarkets } from './carMarket';
+import CarMarket from './car-market';
+import './custom-pools'
+
 
 mp.events.add('playerDeath', (player) => {
 	const randomSpawnPoint = new mp.Vector3(

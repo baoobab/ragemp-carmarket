@@ -1,5 +1,5 @@
 ﻿import { VEHICLE_NAMES } from '@shared/constants';
-import CarMarket, { carMarkets } from "./carMarket";
+import CarMarket, { carMarkets } from "./car-market";
 
 
 /**
