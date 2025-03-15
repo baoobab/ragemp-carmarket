@@ -99,3 +99,12 @@ mp.events.addCommand("rmcolshape", (player, fullText) => {
 
   return player.outputChatBox(`Colshape not found`)
 })
+
+/**
+ * Command to show player position
+ * 
+ * @param player The player who invoked the command.
+ */
+mp.events.addCommand("pos", (player) => {
+  return player.outputChatBox(`x: ${Math.floor(player.position.x)} y: ${Math.floor(player.position.y)} z: ${Math.floor(player.position.z)}`)
+})
