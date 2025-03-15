@@ -1,5 +1,4 @@
-﻿import InfoMarker from "./info-marker";
-import { Dimensions } from "@shared/constants";
+﻿import { Dimensions } from "@shared/constants";
 
 export default class CarMarket {
   private _colshape: ColshapeMp; // CarMarket zone
