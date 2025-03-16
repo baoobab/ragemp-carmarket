@@ -3,6 +3,7 @@ import { CarMarketCreation } from "./car-market";
 import { carMarketsPool } from './custom-pools'
 import { SellPointState } from './sell-point';
 import { teleportToDriverDoor } from './utils';
+import Bank from './bank';
 
 
 /**
@@ -126,12 +127,43 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
 
     teleportToDriverDoor(player, veh)
 
-    sellPoint.placeForSale(vehiclePreview, price, player);
+    if (sellPoint.placeForSale(vehiclePreview, price, player)) {
+      player.outputChatBox(`Success!`)
+    } else {
+      player.outputChatBox(`Cannot place for sale`)
+    }
 	}
   
   // player.call("showVehicleSellConfirmation", [player.vehicle, price, sellPoint]);
 })
 
+/**
+ * Command to buy car from the standing SellPoint.
+ * 
+ * @param player The player who invoked the command, must have enough money.
+ */
+mp.events.addCommand("buycar", (player: PlayerMp, fullText) => {  
+  const targetCarMarketId = player.getVariable<number>("currentCarMarketColshapeId")
+  if (targetCarMarketId === null) {
+    return player.outputChatBox(`You can buy a vehicle only in the car market zone`)
+  }
+  const targetCarMarket = carMarketsPool.filter((market) => market.colshape.id === targetCarMarketId)[0]
+
+  const sellPoint = targetCarMarket.sellPointByPosition(player.position)
+  if (sellPoint == null) {
+    return player.outputChatBox(`You should be on the sell point`)
+  }
+
+  if (sellPoint.state !== SellPointState.FOR_SALE || sellPoint.item === undefined) {
+    return player.outputChatBox(`Sell point is not for sale, try to find another one`)
+  }
+
+  if (sellPoint.item.price > player.money) {
+    return player.outputChatBox(`You don't have enough money`)
+  }
+
+  sellPoint.buy(player)
+})
 /**
  * Command to create a new cuboid colshape.
  * 

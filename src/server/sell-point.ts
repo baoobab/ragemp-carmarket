@@ -58,9 +58,9 @@ export default class SellPoint<TEntityMp extends EntityMp> {
         this._state = SellPointState.EMPTY
         break;
       }
-      // Can set to FOR_SALE only from EMPTY
+      // Can set to FOR_SALE from EMPTY (when seller adds item) and from PURCHASING (when customer leaves the point)
       case SellPointState.FOR_SALE: {
-        if (this._state !== SellPointState.EMPTY) {
+        if (this._state !== SellPointState.EMPTY && this._state !== SellPointState.PURCHASING) {
           return false;
         }
         this._state = SellPointState.FOR_SALE
@@ -127,19 +127,22 @@ export default class SellPoint<TEntityMp extends EntityMp> {
   public get heading() : number {
     return this._heading;
   }
+  public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp): boolean {
+    if (this._state !== SellPointState.EMPTY) return false;
+    if (!this._changeState(SellPointState.FOR_SALE)) return false;
 
-  public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp) {
-    if (this._changeState(SellPointState.FOR_SALE)) {
-      this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
-      this._marker.label = `Seller: ${seller.name}, price: ${price}`
-    } else {
-      seller.outputChatBox(`Cannot place for sale`)
-    }
+    this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+    this._marker.label = `Seller: ${seller.name}, price: ${price}`
+    return true;
   }
 
-  // public buy(customer: PlayerMp) {
-    
-  // }
+  public buy(customer: PlayerMp): boolean {
+    if (this._state !== SellPointState.PURCHASING) {
+      return false;
+    }
+
+    return true;
+  }
   
   public showFor(player: PlayerMp) {
     this._marker.showFor(player)
@@ -147,6 +150,31 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 
   public hideFor(player: PlayerMp) {
     this._marker.hideFor(player)
+  }
+
+  public enter(wouldBeCustomer: PlayerMp) {    
+    if (this._item?.seller && wouldBeCustomer.id === this._item.seller.id) {
+      if (process.env.CAN_OWNER_BY_HIS_OWN === "true") {
+        wouldBeCustomer.outputChatBox(`You are the owner of this point and can buy the own car.
+          /restorecar - remove it from sale`)
+      } else {
+        wouldBeCustomer.outputChatBox(`You are the owner of this point and canNOT buy the own car.
+          /restorecar - remove it from sale`)
+       return; // Seller cannot buy own car
+      }
+    }
+
+    // Lock the point until first-entered player stays on it
+    if (this._state === SellPointState.FOR_SALE) {
+      this._changeState(SellPointState.PURCHASING)
+    }
+  }
+
+  public leave(wouldBeCustomer: PlayerMp) {
+    // If first-entered player leaves the point - it can again be able to purchase
+    if (this._state === SellPointState.PURCHASING) {
+      this._changeState(SellPointState.FOR_SALE)
+    }
   }
 
   // Destructor
