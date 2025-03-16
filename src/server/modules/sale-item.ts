@@ -1,5 +1,4 @@
-﻿
-export interface SellItemCreation<TEntityMp extends EntityMp> {
+﻿export interface SellItemCreation<TEntityMp extends EntityMp> {
   readonly item: TEntityMp;
   readonly price: number;
   readonly seller: PlayerMp;
@@ -36,5 +35,10 @@ export default class SellItem<TEntityMp extends EntityMp> {
 
   public get spawnPosition() : Vector3 {
     return this._spawnPosition;
+  }
+
+  // Destructor
+  destroy() {
+    this._item.destroy()
   }
 }
