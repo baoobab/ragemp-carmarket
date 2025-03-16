@@ -20,3 +20,7 @@ export const teleportToDriverDoor = (player: PlayerMp, vehicle: VehicleMp): void
 
   player.position = position;
 }
+
+export const isDriver = (player: PlayerMp): boolean => {
+  return !!player.vehicle && player.seat === RageEnums.VehicleSeat.DRIVER;
+}
