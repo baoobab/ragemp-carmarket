@@ -23,7 +23,7 @@ mp.events.add('playerDeath', (player) => {
 });
 
 mp.events.add('playerEnterColshape', (player: PlayerMp, colshape: ColshapeMp) => {	
-	player.outputChatBox(`You entered the CUBOID zone`);
+	player.outputChatBox(`You entered the colshape#${colshape.id} zone`);
 
   // TODO: need thinking - mb colshape.getVariable("isCarMarket") === true (bad: abstraction will depends on details???)		
 	mp.events.call("playerEnterCarMarket", player, carMarketsPool.filter((market) => market.colshape.id === colshape.id)[0])
@@ -33,7 +33,7 @@ mp.events.add('playerExitColshape', (player, colshape) => {
 	// TODO: need thinking - mb colshape.getVariable("isCarMarket") === true (bad: abstraction will depends on details???)		
 	mp.events.call("playerExitCarMarket", player, carMarketsPool.filter((market) => market.colshape.id === colshape.id)[0])
 
-	player.outputChatBox(`You leaved the CUBOID zone`);
+	player.outputChatBox(`You leaved the colshape#${colshape.id} zone`);
 });
 
 mp.events.add('playerEnterCarMarket', (player: PlayerMp, carMarket: CarMarket) => {	
