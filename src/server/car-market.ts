@@ -107,6 +107,10 @@ export default class CarMarket {
     this._title = newTitle;
   }
 
+  public get title(): string {
+    return this._title;
+  }
+
   public get colshape() : ColshapeMp {
     return this._colshape
   }
@@ -117,6 +121,14 @@ export default class CarMarket {
 
   public get position() : Vector3 {
     return this._position
+  }
+
+  public sellPointByColshapeId(shapeId: number): SellPoint<VehicleMp> | undefined {
+    return this._sellPoints.filter((point) => point.colshape.id === shapeId)[0]
+  }
+
+  public sellPointByPosition(position: Vector3): SellPoint<VehicleMp> | undefined {
+    return this._sellPoints.filter((point) => point.colshape.isPointWithin(position))[0]
   }
 
   // Signal onEnter - when player enters into Market _colshape
