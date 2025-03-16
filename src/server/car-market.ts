@@ -1,6 +1,6 @@
 ﻿import { CustomEntityType, Dimensions } from "@shared/constants";
 import InfoMarker from "./info-marker";
-import SellPoint from "./sell-point";
+import SellPoint, { SellPointCreation } from "./sell-point";
 
 
 export interface CarMarketCreation {
@@ -61,35 +61,36 @@ export default class CarMarket {
   
     // Placing the sell points on the perimeter
     let sellPointNumber = 1;
+
     // from upper left to upper right (with offsets)
     for (let xPos = upperLeft.x + BOUND_OFFSET; 
       xPos < upperLeft.x + dimensions.width - BOUND_OFFSET;
       xPos += STEP) {  
-      this._sellPoints.push(new SellPoint(
-        new mp.Vector3(xPos, upperLeft.y - BOUND_OFFSET, upperLeft.z),
-        `Empty Slot #${sellPointNumber}`,
-        dimension
-      ));
+      this._sellPoints.push(new SellPoint({
+        position: new mp.Vector3(xPos, upperLeft.y - BOUND_OFFSET, upperLeft.z),
+        title: `Empty Slot #${sellPointNumber}`,
+        dimension: dimension
+      } as SellPointCreation));
       sellPointNumber++;
     }
     
     // from upper right to bottom right (with offsets)
     for (let yPos = upperRight.y - dimensions.depth + BOUND_OFFSET; yPos <= upperRight.y - BOUND_OFFSET; yPos += STEP) {
-      this._sellPoints.push(new SellPoint(
-        new mp.Vector3(upperRight.x - BOUND_OFFSET, yPos, upperRight.z),
-        `Empty Slot #${sellPointNumber}`,
-        dimension
-      ));
+      this._sellPoints.push(new SellPoint({
+        position: new mp.Vector3(upperRight.x - BOUND_OFFSET, yPos, upperRight.z),
+        title: `Empty Slot #${sellPointNumber}`,
+        dimension: dimension
+      } as SellPointCreation));
       sellPointNumber++;
     }
   
     // from upper left to bottom left (with offsets)
     for (let yPos = upperLeft.y - dimensions.depth + BOUND_OFFSET; yPos < upperLeft.y - BOUND_OFFSET; yPos += STEP) {
-      this._sellPoints.push(new SellPoint(
-        new mp.Vector3(upperLeft.x + BOUND_OFFSET, yPos, upperLeft.z),
-        `Empty Slot #${sellPointNumber}`,
-        dimension
-      ));
+      this._sellPoints.push(new SellPoint({
+        position: new mp.Vector3(upperLeft.x + BOUND_OFFSET, yPos, upperLeft.z),
+        title: `Empty Slot #${sellPointNumber}`,
+        dimension: dimension
+      } as SellPointCreation));
       sellPointNumber++;
     }
 
