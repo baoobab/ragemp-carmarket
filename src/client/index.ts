@@ -1,1 +1,1 @@
-import './events';
+import './common/events';
