@@ -12,11 +12,12 @@
 - /buycar - Buys a vehicle that is currently on a sell point at the car market.
 
 - /restorecar - Restore a vehicle that is currently on a sell point at the car market.<br>
-Vehicle will be restored into the seller's ownVehicles storage.
+  Vehicle will be restored into the seller's ownVehicles storage.
 
 - /addcolshape [width height depth] - Creates a new cuboid collision shape with the specified dimensions.
 
-- /addcarmarket [width height depth] - Creates a new car market with a collision shape of the specified dimensions.
+- /addcarmarket [width height depth] - Creates a new car market with a collision shape of the specified dimensions.<br>
+  With default gap between sell points: 5 meters, and 5 meters borders padding.
 
 - /rmcarmarket [id] - Removes a car market by its ID.
 
@@ -30,7 +31,7 @@ Vehicle will be restored into the seller's ownVehicles storage.
 
 ## Quick User Guide: Car Market
 Creating a Car Market<br>
-Use the command /addcarmarket [width height depth] while standing at the desired location for the car market. 
+Use the command /addcarmarket [width height depth] while standing at the desired location for the car market.
 Specify the dimensions of the area the car market should occupy.<br>
 Example: /addcarmarket 20 20 10.
 
@@ -93,3 +94,5 @@ cd ./dist
 ```
 
 > Project structure and configs from Community Example, lot thanks to: [leonardssh](https://github.com/leonardssh/ragemp-typescript)
+
+[&#9786;](https://imgur.com/a/Rxl865p)
