@@ -52,10 +52,10 @@ mp.events.add('playerReady', (player) => {
 });
 
 mp.events.add('playerQuit', (player: PlayerMp, _exitReason: string) => {
-	const markets = carMarketsPool.filter(_ => true)
+	const carMarkets = carMarketsPool.filter(_ => true)
 
 	// Iterate through all car markets
-	markets.forEach(carMarket => {
+	carMarkets.forEach(carMarket => {
 		// Iterate through all sell points in the current car market
 		carMarket.sellPoints.forEach(sellPoint => {
 			if (!sellPoint.item) return;
