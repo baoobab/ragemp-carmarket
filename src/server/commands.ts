@@ -11,22 +11,11 @@ import { teleportToDriverDoor } from './utils';
  * @param player The player who invoked the command.
  * @param carName The name of the vehicle to spawn. One of: VEHICLE_NAMES
  */
-mp.events.addCommand("spawncar", (player: PlayerMp, carName = "") => {  
-  if (!Object.keys(VEHICLE_NAMES).includes(carName)) {
-    return player.outputChatBox('No such vehicle');
-  }
+mp.events.addCommand("spawncar", (player: PlayerMp, carNameString = "") => {  
+  if (!player || !mp.players.exists(player)) return;
+  const carNameHash = mp.joaat(carNameString)
 
-	const vehicle = mp.vehicles.new(mp.joaat(carName), player.position); //Creating the vehicle
-
-	// Adding a custom method to the vehicle which will handle the stream in (will be called from the client).
-	vehicle.onStreamIn = (veh: VehicleMp) => { //supports async as well
-    
-	  if (!player || !mp.players.exists(player)) return; //if the player is no longer available when this method is called we return here.
-
-	  setTimeout(() => {player.putIntoVehicle(veh, 0)}, 200) //we put the player into the vehicle as soon as the vehicle is streamed in.
-	}
-
-	player.position = vehicle.position; //setting player position to the vehicle position
+  player.spawnCar(carNameHash)
 })
 
 /**
@@ -35,24 +24,12 @@ mp.events.addCommand("spawncar", (player: PlayerMp, carName = "") => {
  * @param player The player who invoked the command.
  * @param carName The name of the vehicle to spawn. One of: VEHICLE_NAMES
  */
-mp.events.addCommand("spawnowncar", (player: PlayerMp, carName = "") => {  
-  if (!Object.keys(VEHICLE_NAMES).includes(carName)) {
-    return player.outputChatBox('No such vehicle');
-  }
-
-	const vehicle = mp.vehicles.new(mp.joaat(carName), player.position); //Creating the vehicle
-  player.ownVehicles.push(vehicle) // Store the own vehicle info
-
-	// Adding a custom method to the vehicle which will handle the stream in (will be called from the client).
-	vehicle.onStreamIn = (veh: VehicleMp) => { //supports async as well
-    
-	  if (!player || !mp.players.exists(player)) return; //if the player is no longer available when this method is called we return here.
-
-	  setTimeout(() => {player.putIntoVehicle(veh, 0)}, 200) //we put the player into the vehicle as soon as the vehicle is streamed in.
-	}
-
-	player.position = vehicle.position; //setting player position to the vehicle position
-
+mp.events.addCommand("spawnowncar", (player: PlayerMp, carNameString = "") => {  
+  if (!player || !mp.players.exists(player)) return;
+  const carNameHash = mp.joaat(carNameString)
+  
+  const vehicle = player.spawnCar(carNameHash)
+  if (vehicle) player.ownVehicles.push(vehicle);
 })
 
 /**

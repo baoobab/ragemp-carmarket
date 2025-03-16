@@ -9,6 +9,8 @@ declare global {
 	interface PlayerMp {
 		money: number; // balance on the bank account
 		ownVehicles: VehicleMp[]; // vehicles in ownership
+
+		spawnCar(carName: RageEnums.Hashes.Vehicle): VehicleMp | null;
 	}
   
 	interface VehicleMp {
