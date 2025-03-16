@@ -4,8 +4,9 @@ import SellPoint from "./sell-point";
 
 // CarMarket manages SellPoints and their visibility on the client
 export default class CarMarket {
+  private _title: string = "Car Market"; // CarMarket title, shows on enter point
   private _colshape: ColshapeMp; // CarMarket zone
-  private _sellPoints: SellPoint[] = []; // Points where player can sell/buy a vehicle
+  private _sellPoints: SellPoint<VehicleMp>[] = []; // Points where player can sell/buy a vehicle
   private _enterPoint: InfoMarker; // Enter point to CarMarket, shows info
 
   // signal, which calls when player exits the CarMarket zone. Default is undefined
@@ -84,16 +85,20 @@ export default class CarMarket {
       new mp.Vector3(position.x, position.y - dimensions.depth/2, position.z),
       0,
       [0, 255, 255, 150],
-      `Car Market`,
+      this._title,
       dimension
     )
   }
   
+  public set title(newTitle: string) {
+    this._title = newTitle;
+  }
+
   public get colshape() : ColshapeMp {
     return this._colshape
   }
   
-  public get sellPoints() : SellPoint[] {
+  public get sellPoints() : SellPoint<VehicleMp>[] {
     return this._sellPoints
   }
 

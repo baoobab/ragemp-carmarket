@@ -73,6 +73,16 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     this._marker.hideFor(player)
   }
 
+  // Destructor
+  public destroy() {
+    this._colshape.destroy()
+    this._marker.destroy()
+    if (this._item) delete this._item;
+    this._item = undefined;
+
+    this._state = SellPointState.CLOSED
+  }
+
   // TODO: remove from selling (clear the point only if state: FOR_SALE)
   // TODO: replace selling item (only if state: EMPTY)
   // TODO: event - enterSellPoint
