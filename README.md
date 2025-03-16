@@ -60,7 +60,7 @@ Walk to a Sell Point with own vehicle on it.
 
 Use the command /restorecar.
 
-If that vehicle really was in your ownership, and you place it for sale -<br>
+If that vehicle really was in your ownership, and you placed it for sale -<br>
 it will be restored into ownVehicles.
 
 ## How to run
