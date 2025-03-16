@@ -1,7 +1,7 @@
 ﻿import { CustomEntityType, SPAWNPOINTS } from '@shared/constants';
-import CarMarket from './car-market';
-import { carMarketsPool } from './custom-pools'
-import SellPoint from './sell-point';
+import CarMarket from '../modules/car-market';
+import { carMarketsPool } from '../pools/car-market.pool'
+import SellPoint from '../modules/sell-point';
 
 
 mp.events.add('playerReady', (player) => {

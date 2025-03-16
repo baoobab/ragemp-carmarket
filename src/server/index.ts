@@ -1,4 +1,4 @@
 import './setup';
-import './console';
-import './commands';
-import './events';
+import './common/console';
+import './common/commands';
+import './common/events';

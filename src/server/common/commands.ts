@@ -1,8 +1,8 @@
 ﻿import { Dimensions } from '@shared/constants';
-import { CarMarketCreation } from "./car-market";
-import { carMarketsPool } from './custom-pools'
-import { SellPointState } from './sell-point';
-import { isDriver, teleportToDriverDoor } from './utils';
+import { CarMarketCreation } from "../modules/car-market";
+import { carMarketsPool } from '../pools/car-market.pool'
+import { SellPointState } from '../modules/sell-point';
+import { isDriver, teleportToDriverDoor } from '../utils';
 
 
 /**
