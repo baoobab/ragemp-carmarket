@@ -1,7 +1,8 @@
-﻿import { VEHICLE_NAMES, Dimensions, CustomEntityType } from '@shared/constants';
+﻿import { VEHICLE_NAMES, Dimensions } from '@shared/constants';
 import { CarMarketCreation } from "./car-market";
 import { carMarketsPool } from './custom-pools'
 import { SellPointState } from './sell-point';
+import { teleportToDriverDoor } from './utils';
 
 
 /**
@@ -124,6 +125,8 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
     player.call("client::makeVehiclePreview", [veh.id])
 
     teleportToDriverDoor(player, veh)
+
+    sellPoint.placeForSale(vehiclePreview, price, player);
 	}
   
   // player.call("showVehicleSellConfirmation", [player.vehicle, price, sellPoint]);
