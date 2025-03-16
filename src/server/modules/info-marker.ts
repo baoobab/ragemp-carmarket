@@ -18,7 +18,7 @@ export default class InfoMarker {
 
     this._marker = mp.markers.new(
       markerType,
-      new mp.Vector3(position.x, position.y, position.z),
+      position,
       1,
       {
           color: markerColor,
@@ -28,7 +28,7 @@ export default class InfoMarker {
     if (labelText && labelText.length > 0) {
       this._label = mp.labels.new(
         labelText,
-        position,
+        new mp.Vector3(position.x, position.y, position.z + 2),
         {
             los: true, // Visible only in Line of Sight
             font: 4,
@@ -62,6 +62,14 @@ export default class InfoMarker {
     if (this._label) {      
       this._label.text = text
     }
+  }
+
+  public get color(): Array4d {
+    return this._marker.getColor() as Array4d
+  }
+
+  public set color(color: Array4d) {    
+    this._marker.setColor(...color)
   }
 
   public showFor(player: PlayerMp) {

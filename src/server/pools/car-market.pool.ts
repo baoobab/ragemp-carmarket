@@ -1,7 +1,6 @@
-﻿import CarMarket, { CarMarketCreation } from "./car-market"
+﻿import CarMarket, { CarMarketCreation } from "../modules/car-market"
 
-
-// Singleton repo
+// Singleton repo (analog for Entity Pool)
 export class CarMarketRepository {
   private static _instance: CarMarketRepository;
   private _markets: CarMarket[] = [];
