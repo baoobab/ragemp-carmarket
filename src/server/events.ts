@@ -88,12 +88,14 @@ mp.events.add('playerEnterSellPoint', (player: PlayerMp, sellPoint: SellPoint<Ve
 	if (sellPoint === null) return;	
 
 	player.outputChatBox(`You entered the SELLPOINT ${sellPoint.marker?.label || ""}`);
+	sellPoint.enter(player)
 });
 
 mp.events.add('playerExitSellPoint', (player: PlayerMp, sellPoint: SellPoint<VehicleMp>) => {	
 	if (sellPoint === null) return;	
 
 	player.outputChatBox(`You leaved the SELLPOINT ${sellPoint.marker?.label || ""}`);
+	sellPoint.leave(player)
 });
 
 
