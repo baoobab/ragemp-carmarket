@@ -2,7 +2,6 @@
 import { CarMarketCreation } from "../modules/car-market";
 import { carMarketsPool } from '../pools/car-market.pool'
 import { SellPointState } from '../modules/sell-point';
-import { isDriver, teleportToDriverDoor } from '../utils';
 
 
 /**
@@ -63,7 +62,7 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
   if (!player.vehicle) {
     return player.outputChatBox(`You must be in vehicle`)
   }
-  if (!isDriver(player)) {
+  if (!player.isDriver()) {
     return player.outputChatBox(`You must be a driver`)
   }
 
@@ -123,7 +122,7 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
     player.call("client::makeVehiclePreview", [veh.id])
 
     // Tp driver (seller) into a door
-    teleportToDriverDoor(player, veh)
+    player.teleportToDriverDoor(veh)
 
     // Calls Sell Point to make this item for sale, and player - as a seller
     if (sellPoint.placeForSale(vehiclePreview, price, player)) {
