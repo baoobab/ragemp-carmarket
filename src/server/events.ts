@@ -1,4 +1,4 @@
-﻿import { SPAWNPOINTS } from '@shared/constants';
+﻿import { CustomEntityType, SPAWNPOINTS } from '@shared/constants';
 import CarMarket from './car-market';
 import { carMarketsPool } from './custom-pools'
 
@@ -23,17 +23,29 @@ mp.events.add('playerDeath', (player) => {
 });
 
 mp.events.add('playerEnterColshape', (player: PlayerMp, colshape: ColshapeMp) => {	
-	player.outputChatBox(`You entered the colshape#${colshape.id} zone`);
+	if (!colshape.isForCustomEntityType) {
+		return player.outputChatBox(`You entered the colshape#${colshape.id} zone`);
+	}
 
-  // TODO: need thinking - mb colshape.getVariable("isCarMarket") === true (bad: abstraction will depends on details???)		
-	mp.events.call("playerEnterCarMarket", player, carMarketsPool.filter((market) => market.colshape.id === colshape.id)[0])
+	switch (colshape.customEntityType) {
+		case CustomEntityType.CAR_MARKET: {
+			mp.events.call(`playerEnter${colshape.customEntityType}`, player, carMarketsPool.filter((market) => market.colshape.id === colshape.id)[0])
+			return;
+		}
+	}
 });
 
 mp.events.add('playerExitColshape', (player, colshape) => {
-	// TODO: need thinking - mb colshape.getVariable("isCarMarket") === true (bad: abstraction will depends on details???)		
-	mp.events.call("playerExitCarMarket", player, carMarketsPool.filter((market) => market.colshape.id === colshape.id)[0])
+	if (!colshape.isForCustomEntityType) {
+		return player.outputChatBox(`You leaved the colshape#${colshape.id} zone`);
+	}
 
-	player.outputChatBox(`You leaved the colshape#${colshape.id} zone`);
+	switch (colshape.customEntityType) {
+		case CustomEntityType.CAR_MARKET: {
+			mp.events.call(`playerExit${colshape.customEntityType}`, player, carMarketsPool.filter((market) => market.colshape.id === colshape.id)[0])
+			return;
+		}
+	}
 });
 
 mp.events.add('playerEnterCarMarket', (player: PlayerMp, carMarket: CarMarket) => {	

@@ -1,5 +1,5 @@
-﻿import { VEHICLE_NAMES, Dimensions } from '@shared/constants';
-import CarMarket from "./car-market";
+﻿import { VEHICLE_NAMES, Dimensions, CustomEntityType } from '@shared/constants';
+import { CarMarketCreation } from "./car-market";
 import { carMarketsPool } from './custom-pools'
 
 
@@ -42,7 +42,7 @@ mp.events.addCommand("addcolshape", (player: PlayerMp, fullText: string) => {
   const rawDimensions = fullText.split(" ").map((_) => {return Number(_)})
   const dimensions: Dimensions.Cuboid = {width: rawDimensions[0], depth: rawDimensions[1], height: rawDimensions[2]}
 
-  mp.colshapes.newCuboid(
+  const shape = mp.colshapes.newCuboid(
     player.position.x, // center X-coords
     player.position.y, // center Y-coords
     player.position.z, // center Z-coords
@@ -51,6 +51,7 @@ mp.events.addCommand("addcolshape", (player: PlayerMp, fullText: string) => {
     dimensions.height,
     player.dimension
   );
+  shape.isForCustomEntityType = false;
 })
 
 /**
@@ -67,9 +68,12 @@ mp.events.addCommand("addcarmarket", (player: PlayerMp, fullText: string) => {
   const rawDimensions = fullText.split(" ").map((_) => {return Number(_)})
   const dimensions: Dimensions.Cuboid = {width: rawDimensions[0], depth: rawDimensions[1], height: rawDimensions[2]}
 
-  const carMarket = new CarMarket(player.position, dimensions, player.dimension)
-  
-  carMarketsPool.push(carMarket)
+  const marketCreationAttrs: CarMarketCreation = {
+    position: player.position,
+    dimensions: dimensions, 
+    dimension: player.dimension
+  }
+  carMarketsPool.createMarket(marketCreationAttrs)
 })
 
 /**
