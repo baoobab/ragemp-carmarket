@@ -3,6 +3,12 @@ import CarMarket from './car-market';
 import { carMarketsPool } from './custom-pools'
 
 
+mp.events.add('playerReady', (player) => {
+	// Set the custom variables defined in @types
+	
+	player.ownVehicles = []; // or get from DB/etc
+});
+
 mp.events.add('playerDeath', (player) => {
 	const randomSpawnPoint = new mp.Vector3(
 		SPAWNPOINTS.SpawnPoints[Math.floor(Math.random() * SPAWNPOINTS.SpawnPoints.length)])
