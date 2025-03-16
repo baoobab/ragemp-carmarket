@@ -13,7 +13,7 @@ declare global {
 		spawnCar(carName: RageEnums.Hashes.Vehicle): VehicleMp | null;
 
 		isDriver(): boolean;
-		teleportToDriverDoor(vehicle): void;
+		teleportToDriverDoor(vehicle: VehicleMp): void;
 	}
   
 	interface VehicleMp {
