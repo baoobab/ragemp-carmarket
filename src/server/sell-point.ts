@@ -10,7 +10,7 @@ export enum SellPointState {
 // SellPoint is place where a customer (player) can buy item, which this point is selling now
 // and a seller can create this point and put any item for sale on that
 export default class SellPoint {
-  private _purchaseZone: ColshapeMp; // Area where sell/buy operations affords
+  private _colshape: ColshapeMp; // Area where sell/buy operations affords
   private _marker: InfoMarker; // Only visual, for players
   private _item: VehicleMp | undefined; // Vehicle for sale. Default is undefined
   private _state: SellPointState = SellPointState.EMPTY; // Current state
@@ -39,7 +39,7 @@ export default class SellPoint {
     dimension: number = 1,
     itemForSale?: VehicleMp,
   ) {
-    this._purchaseZone = mp.colshapes.newTube(
+    this._colshape = mp.colshapes.newTube(
       position.x,
       position.y,
       position.z,
