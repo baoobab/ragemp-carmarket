@@ -14,12 +14,14 @@ export interface SellPointCreation {
   readonly position: Vector3;
   readonly title: string;
   readonly dimension: number;
+  readonly heading?: number;
 }
 
 // SellPoint is place where a customer (player) can buy item, which this point is selling now
 // and a seller can create this point and put any item for sale on that
 export default class SellPoint<TEntityMp extends EntityMp> {
   private _colshape: ColshapeMp; // Area where sell/buy operations affords
+  private _heading: number; // from 0 to 360, degrees. To set stored item heading
   private _marker: InfoMarker; // Only visual, for players
   private _item: SaleItem <TEntityMp>| undefined; // Vehicle for sale. Default is undefined
   private _state: SellPointState = SellPointState.EMPTY; // Current state. Default is EMPTY
@@ -63,6 +65,8 @@ export default class SellPoint<TEntityMp extends EntityMp> {
       title,
       dimension
     )
+
+    this._heading = creationAttrs.heading || 0;
   }
 
   public get colshape() : ColshapeMp {
@@ -79,6 +83,10 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 
   public get state() : SellPointState {
     return this._state;
+  }
+
+  public get heading() : number {
+    return this._heading;
   }
 
   public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp) {
