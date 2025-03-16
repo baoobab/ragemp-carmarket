@@ -1,54 +1,55 @@
 ﻿// Singleton Bank class to perform money operations
 export default class Bank {
-  private static _instance: Bank;
-  private constructor() {} // Блокировка прямого создания
+	private static _instance: Bank;
 
-  public static getInstance(): Bank {
-    if (!Bank._instance) {
-      Bank._instance = new Bank();
-    }
-    return Bank._instance;
-  }
+	private constructor() {} // Блокировка прямого создания
 
-  private static _isPlayerExists(player: PlayerMp): boolean {
-  return player && mp.players.exists(player);
-  }
+	public static getInstance(): Bank {
+		if (!Bank._instance) {
+			Bank._instance = new Bank();
+		}
+		return Bank._instance;
+	}
 
-  static balance(player: PlayerMp): number {
-    if (!this._isPlayerExists(player)) return 0;
+	private static _isPlayerExists(player: PlayerMp): boolean {
+		return player && mp.players.exists(player);
+	}
 
-    return player.money || 0;
-  }
+	static balance(player: PlayerMp): number {
+		if (!this._isPlayerExists(player)) return 0;
 
-  static withdraw(player: PlayerMp, amount: number): boolean {
-    if (this.balance(player) >= amount) {
-      player.money -= amount; // Can stores into the cash var/etc
-      return true;
-    }
-    return false;
-  }
+		return player.money || 0;
+	}
 
-  static deposit(player: PlayerMp, amount: number): boolean {
-    if (!this._isPlayerExists(player)) return false;
+	static withdraw(player: PlayerMp, amount: number): boolean {
+		if (this.balance(player) >= amount) {
+			player.money -= amount; // Can stores into the cash var/etc
+			return true;
+		}
+		return false;
+	}
 
-    player.money += amount; // Can takes from the cash var/etc
-    return true
-  }
+	static deposit(player: PlayerMp, amount: number): boolean {
+		if (!this._isPlayerExists(player)) return false;
 
-  // P2P transfer
-  static transfer(sender: PlayerMp, receiver: PlayerMp, amount: number): boolean {
-    // Check that withdrawal (sender's money freezing) passes correctly
-    if (!this.withdraw(sender, amount)) return false;
+		player.money += amount; // Can takes from the cash var/etc
+		return true;
+	}
 
-    // Check that reciever's deposit passes correctly
-    if (!this.deposit(receiver, amount)) {
-      // If not - need to moneyback freezed sender's money
-      this.deposit(sender, amount)
-      return false;
-    }
+	// P2P transfer
+	static transfer(sender: PlayerMp, receiver: PlayerMp, amount: number): boolean {
+		// Check that withdrawal (sender's money freezing) passes correctly
+		if (!this.withdraw(sender, amount)) return false;
 
-    return true;
-  }
+		// Check that reciever's deposit passes correctly
+		if (!this.deposit(receiver, amount)) {
+			// If not - need to moneyback freezed sender's money
+			this.deposit(sender, amount);
+			return false;
+		}
 
-  // in DB: transactions logging, storing history
+		return true;
+	}
+
+	// in DB: transactions logging, storing history
 }
