@@ -54,6 +54,10 @@ export default class InfoMarker {
     return this._position
   }
 
+  public get label(): string | undefined {
+    return this._label?.text
+  }
+
   public set label(text: string) {    
     if (this._label) {      
       this._label.text = text
