@@ -1,7 +1,7 @@
 ﻿import { CustomEntityType, SPAWNPOINTS } from '@shared/constants';
 import CarMarket from '../modules/car-market';
 import { carMarketsPool } from '@/pools/car-market.pool';
-import SellPoint from '../modules/sell-point';
+import SellPoint, { SellPointState } from '../modules/sell-point';
 
 mp.events.add('playerReady', (player) => {
 	if (!player || !mp.players.exists(player)) return;
@@ -49,6 +49,33 @@ mp.events.add('playerReady', (player) => {
 
 		player.position = vehicle.position.add(offset);
 	};
+});
+
+mp.events.add('playerQuit', (player: PlayerMp, _exitReason: string) => {
+	const markets = carMarketsPool.filter(_ => true)
+
+	// Iterate through all car markets
+	markets.forEach(carMarket => {
+		// Iterate through all sell points in the current car market
+		carMarket.sellPoints.forEach(sellPoint => {
+			if (!sellPoint.item) return;
+
+			// Check if the sell point is in a state where the player is selling an item
+			// we can't restore car on the purchasing phase without seller interaction
+			// because customer will be confused about it situation
+			if (sellPoint.state === SellPointState.FOR_SALE
+				&& sellPoint.item.seller.id === player.id) {
+				// Check if the selling item is car
+				if (mp.vehicles.at(sellPoint.item.item.id)) {
+					console.log(`Player ${player.name} quit while selling item
+					at sell point ${sellPoint.colshape.id}. Clearing the lot.`);
+
+					// Clear SellPoint and back vehicle to owner
+					sellPoint.restore(player);
+				}
+			}
+		});
+	});
 });
 
 mp.events.add('playerDeath', (player) => {
