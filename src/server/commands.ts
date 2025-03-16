@@ -26,7 +26,6 @@ mp.events.addCommand("spawncar", (player: PlayerMp, carName = "") => {
 	}
 
 	player.position = vehicle.position; //setting player position to the vehicle position
-
 })
 
 /**
@@ -74,7 +73,7 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
   if (!fullText || isNaN(Number(fullText))) {
     return player.outputChatBox(`Bad price`)
   }  
-    
+
   if (!player.vehicle) {
     return player.outputChatBox(`You must be in vehicle`)
   }
@@ -109,12 +108,23 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
   const destroyVehicleModel = ownVehicle.model
 
   ownVehicle.destroy()
+  // TODO: handle on entityDestroyed
   player.ownVehicles = player.ownVehicles.filter((veh) => {veh.id != destroyVehicleId})
 
-  const vehiclePreview = mp.vehicles.new(destroyVehicleModel, player.position, {
+  const vehiclePreview = mp.vehicles.new(destroyVehicleModel, sellPoint.marker.position, {
     locked: true,
-    heading: price,
+    heading: sellPoint.heading
   });
+
+  vehiclePreview.onStreamIn = (veh: VehicleMp) => { // supports async as well    
+	  veh.setVariable("isPreview", true);
+    veh.movable = false;
+    veh.locked = true;
+    
+    player.call("client::makeVehiclePreview", [veh.id])
+
+    teleportToDriverDoor(player, veh)
+	}
   
   // player.call("showVehicleSellConfirmation", [player.vehicle, price, sellPoint]);
 })
