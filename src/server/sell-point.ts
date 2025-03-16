@@ -1,4 +1,5 @@
-﻿import InfoMarker from "./info-marker";
+﻿import { CustomEntityType } from "@shared/constants";
+import InfoMarker from "./info-marker";
 import SaleItem from "./sale-item";
 
 
@@ -48,6 +49,9 @@ export default class SellPoint<TEntityMp extends EntityMp> {
       2, // purchase radius
       dimension
     )
+    this._colshape.isForCustomEntityType = true;
+    this._colshape.customEntityType = CustomEntityType.SELL_POINT;
+
     this._marker = new InfoMarker(
       new mp.Vector3(position.x, position.y, position.z),
       1,
@@ -55,6 +59,22 @@ export default class SellPoint<TEntityMp extends EntityMp> {
       title,
       dimension
     )
+  }
+
+  public get colshape() : ColshapeMp {
+    return this._colshape;
+  }
+  
+  public get marker() : InfoMarker {
+    return this._marker;
+  }
+
+  public get item() : SaleItem<TEntityMp> | undefined {
+    return this._item;
+  }
+
+  public get state() : SellPointState {
+    return this._state;
   }
 
   public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp) {
