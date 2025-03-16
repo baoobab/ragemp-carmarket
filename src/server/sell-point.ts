@@ -10,13 +10,19 @@ export enum SellPointState {
   PURCHASING, // When customer interacts (purchasing in process)
 }
 
+export interface SellPointCreation {
+  readonly position: Vector3;
+  readonly title: string;
+  readonly dimension: number;
+}
+
 // SellPoint is place where a customer (player) can buy item, which this point is selling now
 // and a seller can create this point and put any item for sale on that
 export default class SellPoint<TEntityMp extends EntityMp> {
   private _colshape: ColshapeMp; // Area where sell/buy operations affords
   private _marker: InfoMarker; // Only visual, for players
   private _item: SaleItem <TEntityMp>| undefined; // Vehicle for sale. Default is undefined
-  private _state: SellPointState = SellPointState.EMPTY; // Current state
+  private _state: SellPointState = SellPointState.EMPTY; // Current state. Default is EMPTY
 
   // Get color by current state
   private _stateColor(): Array4d {
@@ -36,11 +42,9 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     }
   }
 
-  constructor(
-    position: Vector3, 
-    title: string, 
-    dimension: number = 1,
-  ) {
+  constructor(creationAttrs: SellPointCreation) {
+    const {position, title, dimension} = creationAttrs;
+
     this._colshape = mp.colshapes.newTube(
       position.x,
       position.y,
