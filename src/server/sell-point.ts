@@ -165,15 +165,17 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     }
 
     // Lock the point until first-entered player stays on it
-    if (this._state === SellPointState.FOR_SALE) {
-      this._changeState(SellPointState.PURCHASING)
+    if (this._state !== SellPointState.FOR_SALE) return;
+    if (this._changeState(SellPointState.PURCHASING)) {
+      this._marker.label = `--BUSY-- Seller: ${this._item?.seller.name}, price: ${this._item?.price} --BUSY--`
     }
   }
 
   public leave(wouldBeCustomer: PlayerMp) {
     // If first-entered player leaves the point - it can again be able to purchase
-    if (this._state === SellPointState.PURCHASING) {
-      this._changeState(SellPointState.FOR_SALE)
+    if (this._state !== SellPointState.PURCHASING) return;
+    if (this._changeState(SellPointState.FOR_SALE)) {
+      this._marker.label = `Seller: ${this._item?.seller.name}, price: ${this._item?.price}`
     }
   }
 
@@ -189,6 +191,4 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 
   // TODO: remove from selling (clear the point only if state: FOR_SALE)
   // TODO: replace selling item (only if state: EMPTY)
-  // TODO: event - enterSellPoint
-  // TODO: event - exitSellPoint
 }
