@@ -44,6 +44,45 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     }
   }
 
+  private _changeState(newState: SellPointState): boolean {
+    switch (newState) {
+      // Can set to CLOSED only by admin
+      case SellPointState.CLOSED: {
+        return false;
+      }
+      // Can set to EMPTY only from PURCHASING
+      case SellPointState.EMPTY: {
+        if (this._state !== SellPointState.PURCHASING) {
+          return false
+        }
+        this._state = SellPointState.EMPTY
+        break;
+      }
+      // Can set to FOR_SALE only from EMPTY
+      case SellPointState.FOR_SALE: {
+        if (this._state !== SellPointState.EMPTY) {
+          return false;
+        }
+        this._state = SellPointState.FOR_SALE
+        break;
+      }
+      // Can set to PURCHASING only from FOR_SALE
+      case SellPointState.PURCHASING: {
+        if (this._state !== SellPointState.FOR_SALE) {
+          return false;
+        }
+        this._state = SellPointState.PURCHASING
+        break;
+      }
+      default: {
+        return false;
+      }
+    }
+
+    this._marker.color = this._stateColor();
+    return true;
+  }
+
   constructor(creationAttrs: SellPointCreation) {
     const {position, title, dimension} = creationAttrs;
 
@@ -90,7 +129,12 @@ export default class SellPoint<TEntityMp extends EntityMp> {
   }
 
   public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp) {
-    this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+    if (this._changeState(SellPointState.FOR_SALE)) {
+      this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+      this._marker.label = `Seller: ${seller.name}, price: ${price}`
+    } else {
+      seller.outputChatBox(`Cannot place for sale`)
+    }
   }
 
   // public buy(customer: PlayerMp) {
