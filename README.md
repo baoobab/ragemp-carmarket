@@ -11,6 +11,9 @@
 
 - /buycar - Buys a vehicle that is currently on a sell point at the car market.
 
+- /restorecar - Restore a vehicle that is currently on a sell point at the car market.<br>
+Vehicle will be restored into the seller's ownVehicles storage.
+
 - /addcolshape [width height depth] - Creates a new cuboid collision shape with the specified dimensions.
 
 - /addcarmarket [width height depth] - Creates a new car market with a collision shape of the specified dimensions.
@@ -51,6 +54,14 @@ Make sure you have enough money to buy the vehicle.
 Use the command /buycar.
 
 If you have enough money and the vehicle is available, you will complete the purchase.
+
+### Restoring a Vehicle
+Walk to a Sell Point with own vehicle on it.
+
+Use the command /restorecar.
+
+If that vehicle really was in your ownership, and you place it for sale -<br>
+it will be restored into ownVehicles.
 
 ## How to run
 
