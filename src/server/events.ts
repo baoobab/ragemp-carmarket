@@ -25,7 +25,7 @@ mp.events.add('playerDeath', (player) => {
 
 mp.events.add('playerEnterColshape', (player: PlayerMp, colshape: ColshapeMp) => {	
 	if (!colshape.isForCustomEntityType) {
-		return player.outputChatBox(`You entered the colshape#${colshape.id} zone`);
+		return player.outputChatBox(`You entered the colshape#${colshape.id}`);
 	}
 
 	const args: any[] = []
@@ -54,7 +54,7 @@ mp.events.add('playerEnterColshape', (player: PlayerMp, colshape: ColshapeMp) =>
 
 mp.events.add('playerExitColshape', (player, colshape) => {
 	if (!colshape.isForCustomEntityType) {
-		return player.outputChatBox(`You leaved the colshape#${colshape.id} zone`);
+		return player.outputChatBox(`You leaved the colshape#${colshape.id}`);
 	}
 
 	const args: any[] = []
@@ -87,20 +87,20 @@ mp.events.add('playerExitColshape', (player, colshape) => {
 mp.events.add('playerEnterSellPoint', (player: PlayerMp, sellPoint: SellPoint<VehicleMp>) => {	
 	if (sellPoint === null) return;	
 
-	player.outputChatBox(`You entered the SELLPOINT ${sellPoint.marker.label || ""} zone`);
+	player.outputChatBox(`You entered the SELLPOINT ${sellPoint.marker?.label || ""}`);
 });
 
 mp.events.add('playerExitSellPoint', (player: PlayerMp, sellPoint: SellPoint<VehicleMp>) => {	
 	if (sellPoint === null) return;	
 
-	player.outputChatBox(`You leaved the SELLPOINT ${sellPoint.marker.label || ""} zone`);
+	player.outputChatBox(`You leaved the SELLPOINT ${sellPoint.marker?.label || ""}`);
 });
 
 
 mp.events.add('playerEnterCarMarket', (player: PlayerMp, carMarket: CarMarket) => {	
 	if (carMarket === null) return;	
 
-	player.outputChatBox(`You entered the CARMARKET ${carMarket.title} zone`);
+	player.outputChatBox(`You entered the CARMARKET ${carMarket.title}`);
   carMarket.enter(player)
 });
 
@@ -108,7 +108,7 @@ mp.events.add('playerExitCarMarket', (player: PlayerMp, carMarket: CarMarket) =>
 	if (!carMarket) return;
 
   carMarket.exit(player)
-	player.outputChatBox(`You leaved the CARMARKET ${carMarket.title} zone`);
+	player.outputChatBox(`You leaved the CARMARKET ${carMarket.title}`);
 });
 
 // Event which will be called from client when the vehicle streams in

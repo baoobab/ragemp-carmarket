@@ -10,13 +10,21 @@ export enum SellPointState {
   PURCHASING, // When customer interacts (purchasing in process)
 }
 
+export interface SellPointCreation {
+  readonly position: Vector3;
+  readonly title: string;
+  readonly dimension: number;
+  readonly heading?: number;
+}
+
 // SellPoint is place where a customer (player) can buy item, which this point is selling now
 // and a seller can create this point and put any item for sale on that
 export default class SellPoint<TEntityMp extends EntityMp> {
   private _colshape: ColshapeMp; // Area where sell/buy operations affords
+  private _heading: number; // from 0 to 360, degrees. To set stored item heading
   private _marker: InfoMarker; // Only visual, for players
   private _item: SaleItem <TEntityMp>| undefined; // Vehicle for sale. Default is undefined
-  private _state: SellPointState = SellPointState.EMPTY; // Current state
+  private _state: SellPointState = SellPointState.EMPTY; // Current state. Default is EMPTY
 
   // Get color by current state
   private _stateColor(): Array4d {
@@ -36,11 +44,48 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     }
   }
 
-  constructor(
-    position: Vector3, 
-    title: string, 
-    dimension: number = 1,
-  ) {
+  private _changeState(newState: SellPointState): boolean {
+    switch (newState) {
+      // Can set to CLOSED only by admin
+      case SellPointState.CLOSED: {
+        return false;
+      }
+      // Can set to EMPTY only from PURCHASING
+      case SellPointState.EMPTY: {
+        if (this._state !== SellPointState.PURCHASING) {
+          return false
+        }
+        this._state = SellPointState.EMPTY
+        break;
+      }
+      // Can set to FOR_SALE only from EMPTY
+      case SellPointState.FOR_SALE: {
+        if (this._state !== SellPointState.EMPTY) {
+          return false;
+        }
+        this._state = SellPointState.FOR_SALE
+        break;
+      }
+      // Can set to PURCHASING only from FOR_SALE
+      case SellPointState.PURCHASING: {
+        if (this._state !== SellPointState.FOR_SALE) {
+          return false;
+        }
+        this._state = SellPointState.PURCHASING
+        break;
+      }
+      default: {
+        return false;
+      }
+    }
+
+    this._marker.color = this._stateColor();
+    return true;
+  }
+
+  constructor(creationAttrs: SellPointCreation) {
+    const {position, title, dimension} = creationAttrs;
+
     this._colshape = mp.colshapes.newTube(
       position.x,
       position.y,
@@ -59,6 +104,8 @@ export default class SellPoint<TEntityMp extends EntityMp> {
       title,
       dimension
     )
+
+    this._heading = creationAttrs.heading || 0;
   }
 
   public get colshape() : ColshapeMp {
@@ -77,8 +124,17 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     return this._state;
   }
 
+  public get heading() : number {
+    return this._heading;
+  }
+
   public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp) {
-    this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+    if (this._changeState(SellPointState.FOR_SALE)) {
+      this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+      this._marker.label = `Seller: ${seller.name}, price: ${price}`
+    } else {
+      seller.outputChatBox(`Cannot place for sale`)
+    }
   }
 
   // public buy(customer: PlayerMp) {

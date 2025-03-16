@@ -1,6 +1,8 @@
-﻿import { VEHICLE_NAMES, Dimensions, CustomEntityType } from '@shared/constants';
+﻿import { VEHICLE_NAMES, Dimensions } from '@shared/constants';
 import { CarMarketCreation } from "./car-market";
 import { carMarketsPool } from './custom-pools'
+import { SellPointState } from './sell-point';
+import { teleportToDriverDoor } from './utils';
 
 
 /**
@@ -25,7 +27,109 @@ mp.events.addCommand("spawncar", (player: PlayerMp, carName = "") => {
 	}
 
 	player.position = vehicle.position; //setting player position to the vehicle position
+})
 
+/**
+ * Command to spawn an own vehicle. That vehicle has being stored into the player.ownVehicles
+ * 
+ * @param player The player who invoked the command.
+ * @param carName The name of the vehicle to spawn. One of: VEHICLE_NAMES
+ */
+mp.events.addCommand("spawnowncar", (player: PlayerMp, carName = "") => {  
+  if (!Object.keys(VEHICLE_NAMES).includes(carName)) {
+    return player.outputChatBox('No such vehicle');
+  }
+
+	const vehicle = mp.vehicles.new(mp.joaat(carName), player.position); //Creating the vehicle
+  player.ownVehicles.push(vehicle) // Store the own vehicle info
+
+	// Adding a custom method to the vehicle which will handle the stream in (will be called from the client).
+	vehicle.onStreamIn = (veh: VehicleMp) => { //supports async as well
+    
+	  if (!player || !mp.players.exists(player)) return; //if the player is no longer available when this method is called we return here.
+
+	  setTimeout(() => {player.putIntoVehicle(veh, 0)}, 200) //we put the player into the vehicle as soon as the vehicle is streamed in.
+	}
+
+	player.position = vehicle.position; //setting player position to the vehicle position
+
+})
+
+/**
+ * Command to show vehicles in ownership. Vehicles from the player.ownVehicles
+ * 
+ * @param player The player who invoked the command.
+ */
+mp.events.addCommand("owncars", (player: PlayerMp) => {  
+  player.outputChatBox(`own cars count: ${player.ownVehicles.length}\nmodels: ${player.ownVehicles.map((veh) => {return veh.model})}`)
+})
+
+/**
+ * Command to sell the current vehicle.
+ * 
+ * @param player The player who invoked the command, he must owns this vehicle.
+ * @param price the price.
+ */
+mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {  
+  if (!fullText || isNaN(Number(fullText))) {
+    return player.outputChatBox(`Bad price`)
+  }  
+
+  if (!player.vehicle) {
+    return player.outputChatBox(`You must be in vehicle`)
+  }
+
+  const ownVehicle = player.ownVehicles.find((veh) => veh.id === player.vehicle.id)
+  if (!ownVehicle) {
+    return player.outputChatBox(`You can sell only vehicle in ownership`)
+  }
+  
+  const targetCarMarketId = player.getVariable<number>("currentCarMarketColshapeId")
+  if (targetCarMarketId === null) {
+    return player.outputChatBox(`You can sell vehicle only in the car market zone`)
+  }
+  const targetCarMarket = carMarketsPool.filter((market) => market.colshape.id === targetCarMarketId)[0]
+
+  const sellPoint = targetCarMarket.sellPointByPosition(player.position)
+
+  if (sellPoint == null) {
+    return player.outputChatBox(`You should be on the sell point`)
+  }
+
+  if (sellPoint.state !== SellPointState.EMPTY) {
+    return player.outputChatBox(`Sell point is buzy, try to find another one`)
+  }
+
+  const price = Number(fullText);
+
+  ownVehicle.getOccupants().forEach((player) => {
+    player.removeFromVehicle()
+  })
+  const destroyVehicleId = ownVehicle.id
+  const destroyVehicleModel = ownVehicle.model
+
+  ownVehicle.destroy()
+  // TODO: handle on entityDestroyed
+  player.ownVehicles = player.ownVehicles.filter((veh) => {veh.id != destroyVehicleId})
+
+  const vehiclePreview = mp.vehicles.new(destroyVehicleModel, sellPoint.marker.position, {
+    locked: true,
+    heading: sellPoint.heading
+  });
+
+  vehiclePreview.onStreamIn = (veh: VehicleMp) => { // supports async as well    
+	  veh.setVariable("isPreview", true);
+    veh.movable = false;
+    veh.locked = true;
+    
+    player.call("client::makeVehiclePreview", [veh.id])
+
+    teleportToDriverDoor(player, veh)
+
+    sellPoint.placeForSale(vehiclePreview, price, player);
+	}
+  
+  // player.call("showVehicleSellConfirmation", [player.vehicle, price, sellPoint]);
 })
 
 /**

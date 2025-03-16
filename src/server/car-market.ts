@@ -1,6 +1,6 @@
 ﻿import { CustomEntityType, Dimensions } from "@shared/constants";
 import InfoMarker from "./info-marker";
-import SellPoint from "./sell-point";
+import SellPoint, { SellPointCreation } from "./sell-point";
 
 
 export interface CarMarketCreation {
@@ -23,11 +23,26 @@ export default class CarMarket {
   // signal, which calls when player enters the CarMarket zone. Default is undefined
   private _onEnter: ((player: PlayerMp) => void) | undefined;
 
+  private _calculateEnterPointHeading(from: Vector3): number {
+    const delta = this._enterPoint.position.subtract(from);
+    const angle = Math.atan2(delta.y, delta.x) * (180 / Math.PI);
+    
+    return (angle + 360 - 90) % 360;
+  }
 
   // Generates default Market zone with Cuboid colshape, SellPoints on the 3 edges, and enterPoint on the last edge
   constructor(creationAttrs: CarMarketCreation) {
     const {position, dimensions, dimension} = creationAttrs;
     this._position = position
+
+    // Placing the enter point to CarMarket (on the last side of rectangle)
+    this._enterPoint = new InfoMarker(
+      new mp.Vector3(position.x, position.y - dimensions.depth/2, position.z),
+      0,
+      [0, 255, 255, 150],
+      this._title,
+      dimension
+    )
 
     // Paddings for sell points
     const BOUND_OFFSET = 5;
@@ -61,46 +76,52 @@ export default class CarMarket {
   
     // Placing the sell points on the perimeter
     let sellPointNumber = 1;
+
     // from upper left to upper right (with offsets)
     for (let xPos = upperLeft.x + BOUND_OFFSET; 
       xPos < upperLeft.x + dimensions.width - BOUND_OFFSET;
-      xPos += STEP) {  
-      this._sellPoints.push(new SellPoint(
-        new mp.Vector3(xPos, upperLeft.y - BOUND_OFFSET, upperLeft.z),
-        `Empty Slot #${sellPointNumber}`,
-        dimension
-      ));
+      xPos += STEP
+    ) {  
+      const pos = new mp.Vector3(xPos, upperLeft.y - BOUND_OFFSET, upperLeft.z)
+
+      this._sellPoints.push(new SellPoint({
+        position: pos,
+        title: `Empty Slot #${sellPointNumber}`,
+        dimension: dimension,
+        heading: this._calculateEnterPointHeading(pos)
+      } as SellPointCreation));
       sellPointNumber++;
     }
     
     // from upper right to bottom right (with offsets)
-    for (let yPos = upperRight.y - dimensions.depth + BOUND_OFFSET; yPos <= upperRight.y - BOUND_OFFSET; yPos += STEP) {
-      this._sellPoints.push(new SellPoint(
-        new mp.Vector3(upperRight.x - BOUND_OFFSET, yPos, upperRight.z),
-        `Empty Slot #${sellPointNumber}`,
-        dimension
-      ));
+    for (let yPos = upperRight.y - dimensions.depth + BOUND_OFFSET; 
+      yPos <= upperRight.y - BOUND_OFFSET; 
+      yPos += STEP
+    ) {
+      const pos = new mp.Vector3(upperRight.x - BOUND_OFFSET, yPos, upperRight.z)
+      this._sellPoints.push(new SellPoint({
+        position: pos,
+        title: `Empty Slot #${sellPointNumber}`,
+        dimension: dimension,
+        heading: this._calculateEnterPointHeading(pos)
+      } as SellPointCreation));
       sellPointNumber++;
     }
   
     // from upper left to bottom left (with offsets)
-    for (let yPos = upperLeft.y - dimensions.depth + BOUND_OFFSET; yPos < upperLeft.y - BOUND_OFFSET; yPos += STEP) {
-      this._sellPoints.push(new SellPoint(
-        new mp.Vector3(upperLeft.x + BOUND_OFFSET, yPos, upperLeft.z),
-        `Empty Slot #${sellPointNumber}`,
-        dimension
-      ));
+    for (let yPos = upperLeft.y - dimensions.depth + BOUND_OFFSET; 
+      yPos < upperLeft.y - BOUND_OFFSET; 
+      yPos += STEP
+    ) {
+      const pos = new mp.Vector3(upperLeft.x + BOUND_OFFSET, yPos, upperLeft.z)
+      this._sellPoints.push(new SellPoint({
+        position: pos,
+        title: `Empty Slot #${sellPointNumber}`,
+        dimension: dimension,
+        heading: this._calculateEnterPointHeading(pos)
+      } as SellPointCreation));
       sellPointNumber++;
     }
-
-    // Placing the enter point to CarMarket (on the last side of rectangle)
-    this._enterPoint = new InfoMarker(
-      new mp.Vector3(position.x, position.y - dimensions.depth/2, position.z),
-      0,
-      [0, 255, 255, 150],
-      this._title,
-      dimension
-    )
   }
   
   public set title(newTitle: string) {
