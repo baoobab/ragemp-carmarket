@@ -10,8 +10,29 @@ mp.events.add('playerReady', (player) => {
 
 	player.ownVehicles = []; // or restore from DB/etc
 
-	// start balance on the bank account
+	// Start balance on the bank account
 	player.money = 1000; // or restore from DB/etc
+
+	// Custom method to spawn a car in player position
+	player.spawnCar = (carName: RageEnums.Hashes.Vehicle) => {
+		if (player.vehicle) {
+			player.outputChatBox("You need to leave the current vehicle")
+			return null;
+		}
+
+		const vehicle = mp.vehicles.new(carName, player.position); // Creating the vehicle
+	
+		// Adding a custom method to the vehicle which will handle the stream in (will be called from the client).
+		vehicle.onStreamIn = (veh: VehicleMp) => { // Supports async as well
+			
+			if (!player || !mp.players.exists(player)) return; // If the player is no longer available when this method is called we return here.
+	
+			setTimeout(() => {player.putIntoVehicle(veh, 0)}, 200) // Put the player into the vehicle as soon as the vehicle is streamed in.
+		}
+		player.position = vehicle.position; // Setting player position to the vehicle position
+
+		return vehicle;
+	}
 });
 
 mp.events.add('playerDeath', (player) => {
