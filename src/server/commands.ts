@@ -118,7 +118,7 @@ mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {
 
   ownVehicle.destroy()
   // TODO: handle on entityDestroyed
-  player.ownVehicles.splice(player.ownVehicles.findIndex(veh => veh.id === ownVehicle.id), 1)
+  player.ownVehicles.splice(player.ownVehicles.findIndex(veh => veh.id === destroyVehicleId), 1)
 
   const vehiclePreview = mp.vehicles.new(destroyVehicleModel, sellPoint.marker.position, {
     locked: true,
