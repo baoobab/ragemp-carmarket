@@ -24,6 +24,7 @@ export default class SellPoint<TEntityMp extends EntityMp> {
   private _colshape: ColshapeMp; // Area where sell/buy operations affords
   private _heading: number; // from 0 to 360, degrees. To set stored item heading
   private _marker: InfoMarker; // Only visual, for players
+  private _defaultLabel: string;
   private _item: SaleItem<TEntityMp>| undefined; // Vehicle for sale. Default is undefined
   private _state: SellPointState = SellPointState.EMPTY; // Current state. Default is EMPTY
 
@@ -106,6 +107,7 @@ export default class SellPoint<TEntityMp extends EntityMp> {
       dimension
     )
 
+    this._defaultLabel = title;
     this._heading = creationAttrs.heading || 0;
   }
 
@@ -151,7 +153,9 @@ export default class SellPoint<TEntityMp extends EntityMp> {
       });
       customer.ownVehicles.push(purchasedVehicle)
 
-      this._item.item.destroy()
+      this._item.destroy()
+      this._item = undefined;
+      this._marker.label = this._defaultLabel
       return this._changeState(SellPointState.EMPTY)
     }
 
@@ -169,11 +173,9 @@ export default class SellPoint<TEntityMp extends EntityMp> {
   public enter(wouldBeCustomer: PlayerMp) {    
     if (this._item?.seller && wouldBeCustomer.id === this._item.seller.id) {
       if (process.env.CAN_OWNER_BY_HIS_OWN === "true") {
-        wouldBeCustomer.outputChatBox(`You are the owner of this point and can buy the own car.
-          /restorecar - remove it from sale`)
+        wouldBeCustomer.outputChatBox(`You are the owner of this point and can buy the own car.`) // /restorecar - remove it from sale
       } else {
-        wouldBeCustomer.outputChatBox(`You are the owner of this point and canNOT buy the own car.
-          /restorecar - remove it from sale`)
+        wouldBeCustomer.outputChatBox(`You are the owner of this point and canNOT buy the own car.`) // /restorecar - remove it from sale
        return; // Seller cannot buy own car
       }
     }
@@ -185,7 +187,7 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     }
   }
 
-  public leave(wouldBeCustomer: PlayerMp) {
+  public leave(_wouldBeCustomer: PlayerMp) {
     // If first-entered player leaves the point - it can again be able to purchase
     if (this._state !== SellPointState.PURCHASING) return;
     if (this._changeState(SellPointState.FOR_SALE)) {
@@ -202,7 +204,4 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 
     this._state = SellPointState.CLOSED
   }
-
-  // TODO: remove from selling (clear the point only if state: FOR_SALE)
-  // TODO: replace selling item (only if state: EMPTY)
 }
