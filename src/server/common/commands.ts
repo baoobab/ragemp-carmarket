@@ -49,7 +49,7 @@ mp.events.addCommand("owncars", (player: PlayerMp) => {
 mp.events.addCommand("sellcar", (player: PlayerMp, fullText) => {  
   // Checks
   if (!fullText || isNaN(Number(fullText))) {
-    return player.outputChatBox(`Bad price`)
+    return player.outputChatBox(`Bad price. Usage /sellcar [price]`)
   }  
 
   const price = Number(fullText);
@@ -184,7 +184,7 @@ mp.events.addCommand("buycar", (player: PlayerMp, _fullText) => {
 mp.events.addCommand("addcolshape", (player: PlayerMp, fullText: string) => {
   // Checks
   if (!fullText || fullText.split(" ").length < 3) {
-    return player.outputChatBox(`Bad dimensions`)
+    return player.outputChatBox(`Bad dimensions. Usage /addcolshape [width depth height]`)
   }
 
   const rawDimensions = fullText.split(" ").map((_) => {
@@ -222,7 +222,7 @@ mp.events.addCommand("addcolshape", (player: PlayerMp, fullText: string) => {
 mp.events.addCommand("addcarmarket", (player: PlayerMp, fullText: string) => {
   // Checks
   if (!fullText || fullText.split(" ").length < 3) {
-    return player.outputChatBox(`Bad dimensions`)
+    return player.outputChatBox(`Bad dimensions. Usage /addcolshape [width depth height]`)
   }
 
   const rawDimensions = fullText.split(" ").map((_) => {
@@ -258,7 +258,7 @@ mp.events.addCommand("addcarmarket", (player: PlayerMp, fullText: string) => {
  */
 mp.events.addCommand("rmcarmarket", (player, fullText) => {
   if (!fullText || isNaN(Number(fullText))) {
-    return player.outputChatBox(`Bad input`)
+    return player.outputChatBox(`Bad input. Usage /rmcarmarket [id]`)
   }
 
   const marketId = Number(fullText)
@@ -280,7 +280,7 @@ mp.events.addCommand("rmcarmarket", (player, fullText) => {
  */
 mp.events.addCommand("rmcolshape", (player, fullText) => {
   if (!fullText || isNaN(Number(fullText))) {
-    return player.outputChatBox(`Bad input`)
+    return player.outputChatBox(`Bad input. Usage /rmcolshape [id]`)
   }
 
   const shapeId = Number(fullText)
@@ -329,7 +329,7 @@ mp.events.addCommand("money", (player) => {
 mp.events.addCommand("setmoney", (player, fullText) => {
   if (!player || !mp.players.exists(player)) return;
   if (!fullText || isNaN(Number(fullText))) {
-    return player.outputChatBox(`Bad input`);
+    return player.outputChatBox(`Bad input. Usage /setmoney [amount]`);
   }
   const amount = Number(fullText)
 
