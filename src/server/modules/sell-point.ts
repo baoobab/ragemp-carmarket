@@ -231,7 +231,7 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 	public enter(wouldBeCustomer: PlayerMp) {
 		// If player who entered - is the seller of this point
 		if (this._item?.seller && wouldBeCustomer.id === this._item.seller.id) {
-			if (process.env.CAN_OWNER_BY_HIS_OWN === 'true') {
+			if (process.env.CAN_OWNER_BUY_HIS_OWN === 'true') {
 				wouldBeCustomer.outputChatBox(`You are the owner of this point and can buy the own car.`); // /restorecar - remove it from sale
 			} else {
 				wouldBeCustomer.outputChatBox(`You are the owner of this point and canNOT buy the own car.`); // /restorecar - remove it from sale
