@@ -187,10 +187,15 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 	}
 
 	// When Seller wants to restore item, placed on sell before
-	public restore(customer: PlayerMp): boolean {
+	public restore(seller: PlayerMp): boolean {
 		// If Sell Point doesn't contain any item - we can't buy a nothing
 		if (!this._item) {
-			customer.outputChatBox(`This sale point is empty`);
+			seller.outputChatBox(`This sale point is empty`);
+			return false;
+		}
+		// If player who wasn't the seller tries to restore
+		if (this._item.seller.id !== seller.id) {
+			seller.outputChatBox(`You are not seller for this Sell Point!`);
 			return false;
 		}
 
@@ -203,7 +208,7 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 			const restoredVehicle = mp.vehicles.new(this._item.item.model, this._item.spawnPosition, {
 				heading: this._heading
 			});
-			customer.ownVehicles.push(restoredVehicle);
+			seller.ownVehicles.push(restoredVehicle);
 
 			this._item.destroy();
 			this._item = undefined;
