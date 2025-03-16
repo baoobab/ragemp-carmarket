@@ -55,13 +55,6 @@ mp.events.addCommand('sellcar', (player: PlayerMp, fullText) => {
 		return player.outputChatBox(`Bad price. Usage /sellcar [price]`);
 	}
 
-	const price = Number(fullText);
-	if (price <= 0) {
-		return player.outputChatBox(`Price must be a positive number`);
-	}
-	if (!Number.isInteger(price)) {
-		return player.outputChatBox(`Price must be an integer`);
-	}
 	if (!player.vehicle) {
 		return player.outputChatBox(`You must be in vehicle`);
 	}
@@ -75,6 +68,7 @@ mp.events.addCommand('sellcar', (player: PlayerMp, fullText) => {
 	}
 
 	// logics
+	const price = Number(fullText);
 
 	// Car Market id updates on every leave/entry event, try take it
 	const targetCarMarketId = player.getVariable<number>('currentCarMarketColshapeId');
@@ -159,18 +153,6 @@ mp.events.addCommand('buycar', (player: PlayerMp, _fullText) => {
 		return player.outputChatBox(`You should be on the sell point`);
 	}
 
-	// Checks
-
-	// If Sell Point doesn't contains any item - we can't by a nothing
-	if (!sellPoint.item) {
-		return player.outputChatBox(`This sale point is empty`);
-	}
-
-	// If Item price is too high
-	if (sellPoint.item.price > player.money) {
-		return player.outputChatBox(`You don't have enough money`);
-	}
-
 	// Logics
 
 	// Calls Sell Point to buy this item
@@ -180,6 +162,7 @@ mp.events.addCommand('buycar', (player: PlayerMp, _fullText) => {
 		player.outputChatBox(`Cannot buy`);
 	}
 });
+
 
 /**
  * Command to create a new cuboid colshape.
