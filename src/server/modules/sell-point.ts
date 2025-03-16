@@ -51,7 +51,8 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 			case SellPointState.CLOSED: {
 				return false;
 			}
-			// Can set to EMPTY only from PURCHASING
+			// Can set to EMPTY from PURCHASING (when customer buy a car)
+			// and from FOR_SALE (when seller want to restore item)
 			case SellPointState.EMPTY: {
 				if (this._state !== SellPointState.PURCHASING) {
 					return false;
@@ -59,7 +60,8 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 				this._state = SellPointState.EMPTY;
 				break;
 			}
-			// Can set to FOR_SALE from EMPTY (when seller adds item) and from PURCHASING (when customer leaves the point)
+			// Can set to FOR_SALE from EMPTY (when seller adds item)
+			// and from PURCHASING (when customer leaves the point)
 			case SellPointState.FOR_SALE: {
 				if (this._state !== SellPointState.EMPTY && this._state !== SellPointState.PURCHASING) {
 					return false;
@@ -130,7 +132,17 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 		return this._heading;
 	}
 
+	// When Seller place item for sale
 	public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp): boolean {
+		if (price <= 0) {
+			seller.outputChatBox(`Price must be a positive number`);
+			return false;
+		}
+		if (!Number.isInteger(price)) {
+			seller.outputChatBox(`Price must be an integer`);
+			return false;
+		}
+
 		if (this._state !== SellPointState.EMPTY) return false;
 		if (!this._changeState(SellPointState.FOR_SALE)) return false;
 
@@ -143,8 +155,20 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 		return true;
 	}
 
+	// When Customer start purchase process
 	public buy(customer: PlayerMp): boolean {
-		if (this._state !== SellPointState.PURCHASING || this._item === undefined) return false;
+		// If Sell Point doesn't contain any item - we can't buy a nothing
+		if (!this._item) {
+			customer.outputChatBox(`This sale point is empty`);
+			return false;
+		}
+		// If Item price is too high
+		if (this._item.price > customer.money) {
+			customer.outputChatBox(`You don't have enough money`);
+			return false;
+		}
+
+		if (this._state !== SellPointState.PURCHASING) return false;
 		if (!Bank.transfer(customer, this._item.seller, this._item.price)) return false;
 
 		if (mp.vehicles.at(this._item.item.id)) {
@@ -158,6 +182,9 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 			this._marker.label = this._defaultLabel;
 			return this._changeState(SellPointState.EMPTY);
 		}
+
+		return false;
+	}
 
 		return false;
 	}
