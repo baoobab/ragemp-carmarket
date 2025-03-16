@@ -11,10 +11,15 @@ declare global {
 		ownVehicles: VehicleMp[]; // vehicles in ownership
 
 		spawnCar(carName: RageEnums.Hashes.Vehicle): VehicleMp | null;
+
+		isDriver(): boolean;
+		teleportToDriverDoor(vehicle: VehicleMp): void;
 	}
   
 	interface VehicleMp {
 		onStreamIn(vehicle: VehicleMp): void;
+
+		isRightHandDrive(): boolean;
 	}
 }
 

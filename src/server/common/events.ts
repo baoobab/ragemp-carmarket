@@ -1,7 +1,7 @@
 ﻿import { CustomEntityType, SPAWNPOINTS } from '@shared/constants';
-import CarMarket from './car-market';
-import { carMarketsPool } from './custom-pools'
-import SellPoint from './sell-point';
+import CarMarket from '../modules/car-market';
+import { carMarketsPool } from '../pools/car-market.pool'
+import SellPoint from '../modules/sell-point';
 
 
 mp.events.add('playerReady', (player) => {
@@ -13,7 +13,7 @@ mp.events.add('playerReady', (player) => {
 	// Start balance on the bank account
 	player.money = 1000; // or restore from DB/etc
 
-	// Custom method to spawn a car in player position
+	// Custom method to spawn a car in player position (just keep in mind - each player is admin for now)
 	player.spawnCar = (carName: RageEnums.Hashes.Vehicle) => {
 		if (player.vehicle) {
 			player.outputChatBox("You need to leave the current vehicle")
@@ -32,6 +32,24 @@ mp.events.add('playerReady', (player) => {
 		player.position = vehicle.position; // Setting player position to the vehicle position
 
 		return vehicle;
+	}
+
+	// Custom method to check - is player a driver now
+	player.isDriver = (): boolean => {
+		return !!player.vehicle && player.seat === RageEnums.VehicleSeat.DRIVER;
+	}
+
+	// Custom methos to tp player to the target vehicle (just keep in mind - each player is admin for now)
+	player.teleportToDriverDoor = (vehicle: VehicleMp): void => {
+		const offset = vehicle.isRightHandDrive() 
+			? new mp.Vector3(-1.2, 0, 0) // right offset
+			: new mp.Vector3(1.2, 0, 0); // left offset
+	
+		const position = vehicle.position.add(
+			offset
+		);
+	
+		player.position = position;
 	}
 });
 
@@ -140,5 +158,18 @@ mp.events.add('server::vehicleStreamIn', async (_player, remoteid) => {
 
 	if (!vehicle || !mp.vehicles.exists(vehicle)) return;
 	if (!vehicle.onStreamIn || typeof vehicle.onStreamIn === 'undefined') return;
+
+	// Custom method to check vehicle steering-hand type
+	vehicle.isRightHandDrive = (): boolean => {
+		const model = vehicle.model;
+		
+		const RHD_MODELS = new Set([
+			mp.joaat(''),
+			// or any right-hand car
+		]);
+	
+		return RHD_MODELS.has(model);
+	};
+
 	vehicle.onStreamIn.constructor.name === 'AsyncFunction' ? await vehicle.onStreamIn(vehicle) : vehicle.onStreamIn(vehicle);
 });
