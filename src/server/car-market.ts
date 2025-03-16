@@ -1,9 +1,20 @@
-﻿import { Dimensions } from "@shared/constants";
+﻿import { CustomEntityType, Dimensions } from "@shared/constants";
 import InfoMarker from "./info-marker";
+import SellPoint from "./sell-point";
 
+
+export interface CarMarketCreation {
+  readonly position: Vector3;
+  readonly dimensions: Dimensions.Cuboid;
+  readonly dimension: number;
+}
+
+// CarMarket manages SellPoints and their visibility on the client
 export default class CarMarket {
+  private _title: string = "Car Market"; // CarMarket title, shows on enter point
+  private _position: Vector3; // Center position
   private _colshape: ColshapeMp; // CarMarket zone
-  private _sellPoints: MarkerMp[] = []; // Points where player can sell/buy a vehicle
+  private _sellPoints: SellPoint<VehicleMp>[] = []; // Points where player can sell/buy a vehicle
   private _enterPoint: InfoMarker; // Enter point to CarMarket, shows info
 
   // signal, which calls when player exits the CarMarket zone. Default is undefined
@@ -14,7 +25,10 @@ export default class CarMarket {
 
 
   // Generates default Market zone with Cuboid colshape, SellPoints on the 3 edges, and enterPoint on the last edge
-  constructor(position: Vector3, dimensions: Dimensions.Cuboid, dimension: number = 1) {
+  constructor(creationAttrs: CarMarketCreation) {
+    const {position, dimensions, dimension} = creationAttrs;
+    this._position = position
+
     // Paddings for sell points
     const BOUND_OFFSET = 5;
     const STEP = 5;
@@ -29,6 +43,8 @@ export default class CarMarket {
       dimensions.height,
       dimension,
     );
+    this._colshape.isForCustomEntityType = true;
+    this._colshape.customEntityType = CustomEntityType.CAR_MARKET;
   
     // CarMarket zone corners
     const upperLeft = new mp.Vector3(
@@ -44,37 +60,37 @@ export default class CarMarket {
   
   
     // Placing the sell points on the perimeter
-
+    let sellPointNumber = 1;
     // from upper left to upper right (with offsets)
     for (let xPos = upperLeft.x + BOUND_OFFSET; 
       xPos < upperLeft.x + dimensions.width - BOUND_OFFSET;
-      xPos += STEP) {
-      this._sellPoints.push(mp.markers.new(
-        1,
+      xPos += STEP) {  
+      this._sellPoints.push(new SellPoint(
         new mp.Vector3(xPos, upperLeft.y - BOUND_OFFSET, upperLeft.z),
-        1,
-        { color: [255, 0, 0, 150], dimension: dimension }
+        `Empty Slot #${sellPointNumber}`,
+        dimension
       ));
+      sellPointNumber++;
     }
     
     // from upper right to bottom right (with offsets)
     for (let yPos = upperRight.y - dimensions.depth + BOUND_OFFSET; yPos <= upperRight.y - BOUND_OFFSET; yPos += STEP) {
-      this._sellPoints.push(mp.markers.new(
-        1,
+      this._sellPoints.push(new SellPoint(
         new mp.Vector3(upperRight.x - BOUND_OFFSET, yPos, upperRight.z),
-        1,
-        { color: [0, 255, 0, 150], dimension: dimension }
+        `Empty Slot #${sellPointNumber}`,
+        dimension
       ));
+      sellPointNumber++;
     }
   
     // from upper left to bottom left (with offsets)
     for (let yPos = upperLeft.y - dimensions.depth + BOUND_OFFSET; yPos < upperLeft.y - BOUND_OFFSET; yPos += STEP) {
-      this._sellPoints.push(mp.markers.new(
-        1,
+      this._sellPoints.push(new SellPoint(
         new mp.Vector3(upperLeft.x + BOUND_OFFSET, yPos, upperLeft.z),
-        1,
-        { color: [0, 0, 255, 150], dimension: dimension }
+        `Empty Slot #${sellPointNumber}`,
+        dimension
       ));
+      sellPointNumber++;
     }
 
     // Placing the enter point to CarMarket (on the last side of rectangle)
@@ -82,18 +98,37 @@ export default class CarMarket {
       new mp.Vector3(position.x, position.y - dimensions.depth/2, position.z),
       0,
       [0, 255, 255, 150],
-      `Car Market`,
+      this._title,
       dimension
     )
-    this._enterPoint.label = "bebra"
   }
   
+  public set title(newTitle: string) {
+    this._title = newTitle;
+  }
+
+  public get title(): string {
+    return this._title;
+  }
+
   public get colshape() : ColshapeMp {
     return this._colshape
   }
   
-  public get sellPoints() : MarkerMp[] {
+  public get sellPoints() : SellPoint<VehicleMp>[] {
     return this._sellPoints
+  }
+
+  public get position() : Vector3 {
+    return this._position
+  }
+
+  public sellPointByColshapeId(shapeId: number): SellPoint<VehicleMp> | undefined {
+    return this._sellPoints.filter((point) => point.colshape.id === shapeId)[0]
+  }
+
+  public sellPointByPosition(position: Vector3): SellPoint<VehicleMp> | undefined {
+    return this._sellPoints.filter((point) => point.colshape.isPointWithin(position))[0]
   }
 
   // Signal onEnter - when player enters into Market _colshape

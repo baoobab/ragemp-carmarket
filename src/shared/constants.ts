@@ -6,6 +6,14 @@ export namespace Dimensions {
   }
 }
 
+export enum CustomEntityType {
+  // BANK = 'Bank',
+  CAR_MARKET = 'CarMarket',
+  SELL_POINT = 'SellPoint',
+  INFO_MARKER = 'InfoMarker',
+  SALE_ITEM = "SaleItem"
+}
+
 export const SPAWNPOINTS = {
   "SpawnPoints": [
       { "x": -425.517, "y": 1123.620, "z": 325.854 },

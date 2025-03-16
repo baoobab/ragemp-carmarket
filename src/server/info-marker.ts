@@ -1,4 +1,5 @@
-﻿export default class InfoMarker {
+﻿// InfoMarker is extended MarkerMp, which can contain also: label and colshape
+export default class InfoMarker {
   private _marker: MarkerMp;
   private _label: TextLabelMp | undefined;
   private _colshape: ColshapeMp | undefined;
@@ -10,8 +11,9 @@
     markerColor: Array4d, 
     labelText?: string, 
     dimension: number = 1,
-    colshape?: ColshapeMp) {
-    
+    colshape?: ColshapeMp
+  ) {
+
     this._position = position;
 
     this._marker = mp.markers.new(
@@ -52,9 +54,21 @@
     return this._position
   }
 
+  public get label(): string | undefined {
+    return this._label?.text
+  }
+
   public set label(text: string) {    
     if (this._label) {      
       this._label.text = text
     }
+  }
+
+  public showFor(player: PlayerMp) {
+    this._marker.showFor(player)
+  }
+
+  public hideFor(player: PlayerMp) {
+    this._marker.hideFor(player)
   }
 }
