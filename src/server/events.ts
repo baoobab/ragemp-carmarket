@@ -102,7 +102,7 @@ mp.events.add('playerExitSellPoint', (player: PlayerMp, sellPoint: SellPoint<Veh
 mp.events.add('playerEnterCarMarket', (player: PlayerMp, carMarket: CarMarket) => {	
 	if (carMarket === null) return;	
 
-	player.outputChatBox(`You entered the CARMARKET ${carMarket.title}`);
+	player.outputChatBox(`You entered the CARMARKET#${carMarket.colshape.id}: ${carMarket.title}`);
   carMarket.enter(player)
 });
 
@@ -110,7 +110,7 @@ mp.events.add('playerExitCarMarket', (player: PlayerMp, carMarket: CarMarket) =>
 	if (!carMarket) return;
 
   carMarket.exit(player)
-	player.outputChatBox(`You leaved the CARMARKET ${carMarket.title}`);
+	player.outputChatBox(`You leaved the CARMARKET#${carMarket.colshape.id}: ${carMarket.title}`);
 });
 
 // Event which will be called from client when the vehicle streams in

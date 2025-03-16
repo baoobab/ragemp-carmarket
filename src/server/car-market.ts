@@ -7,6 +7,7 @@ export interface CarMarketCreation {
   readonly position: Vector3;
   readonly dimensions: Dimensions.Cuboid;
   readonly dimension: number;
+  readonly title?: string;
 }
 
 // CarMarket manages SellPoints and their visibility on the client
@@ -32,7 +33,7 @@ export default class CarMarket {
 
   // Generates default Market zone with Cuboid colshape, SellPoints on the 3 edges, and enterPoint on the last edge
   constructor(creationAttrs: CarMarketCreation) {
-    const {position, dimensions, dimension} = creationAttrs;
+    const {position, dimensions, dimension, title} = creationAttrs;
     this._position = position
 
     // Placing the enter point to CarMarket (on the last side of rectangle)
@@ -40,7 +41,7 @@ export default class CarMarket {
       new mp.Vector3(position.x, position.y - dimensions.depth/2, position.z),
       0,
       [0, 255, 255, 150],
-      this._title,
+      title ? title : this._title,
       dimension
     )
 
@@ -54,8 +55,8 @@ export default class CarMarket {
       position.y, // center Y-coords
       position.z, // center Z-coords
       dimensions.width,
-      dimensions.depth,
       dimensions.height,
+      dimensions.depth,
       dimension,
     );
     this._colshape.isForCustomEntityType = true;
@@ -126,6 +127,7 @@ export default class CarMarket {
   
   public set title(newTitle: string) {
     this._title = newTitle;
+    this._enterPoint.label = this._title;
   }
 
   public get title(): string {
@@ -187,9 +189,8 @@ export default class CarMarket {
   // Destructor
   public destroy() {
     this._colshape.destroy()
-    
-    while (this._sellPoints.length > 0) {
-      this._sellPoints[0].destroy()
-    }
+    this._enterPoint.destroy()
+
+    this._sellPoints.map((point) => {point.destroy()})
   }
 }

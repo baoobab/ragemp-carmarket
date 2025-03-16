@@ -1,6 +1,7 @@
 ﻿import { CustomEntityType } from "@shared/constants";
 import InfoMarker from "./info-marker";
-import SaleItem from "./sale-item";
+import SaleItem, { SellItemCreation } from "./sale-item";
+import Bank from "./bank";
 
 
 export enum SellPointState {
@@ -23,7 +24,7 @@ export default class SellPoint<TEntityMp extends EntityMp> {
   private _colshape: ColshapeMp; // Area where sell/buy operations affords
   private _heading: number; // from 0 to 360, degrees. To set stored item heading
   private _marker: InfoMarker; // Only visual, for players
-  private _item: SaleItem <TEntityMp>| undefined; // Vehicle for sale. Default is undefined
+  private _item: SaleItem<TEntityMp>| undefined; // Vehicle for sale. Default is undefined
   private _state: SellPointState = SellPointState.EMPTY; // Current state. Default is EMPTY
 
   // Get color by current state
@@ -131,17 +132,30 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     if (this._state !== SellPointState.EMPTY) return false;
     if (!this._changeState(SellPointState.FOR_SALE)) return false;
 
-    this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+    this._item = new SaleItem<TEntityMp>({
+      item: itemForSale, 
+      price: price, 
+      seller: seller
+    } as SellItemCreation<TEntityMp>);
     this._marker.label = `Seller: ${seller.name}, price: ${price}`
     return true;
   }
 
   public buy(customer: PlayerMp): boolean {
-    if (this._state !== SellPointState.PURCHASING) {
-      return false;
+    if (this._state !== SellPointState.PURCHASING || this._item === undefined) return false;
+    if (!Bank.transfer(customer, this._item.seller, this._item.price)) return false;
+
+    if (mp.vehicles.at(this._item.item.id)) {
+      const purchasedVehicle = mp.vehicles.new(this._item.item.model, this._item.spawnPosition, {
+        heading: this._heading
+      });
+      customer.ownVehicles.push(purchasedVehicle)
+
+      this._item.item.destroy()
+      return this._changeState(SellPointState.EMPTY)
     }
 
-    return true;
+    return false;
   }
   
   public showFor(player: PlayerMp) {
@@ -165,15 +179,17 @@ export default class SellPoint<TEntityMp extends EntityMp> {
     }
 
     // Lock the point until first-entered player stays on it
-    if (this._state === SellPointState.FOR_SALE) {
-      this._changeState(SellPointState.PURCHASING)
+    if (this._state !== SellPointState.FOR_SALE) return;
+    if (this._changeState(SellPointState.PURCHASING)) {
+      this._marker.label = `--BUSY-- Seller: ${this._item?.seller.name}, price: ${this._item?.price} --BUSY--`
     }
   }
 
   public leave(wouldBeCustomer: PlayerMp) {
     // If first-entered player leaves the point - it can again be able to purchase
-    if (this._state === SellPointState.PURCHASING) {
-      this._changeState(SellPointState.FOR_SALE)
+    if (this._state !== SellPointState.PURCHASING) return;
+    if (this._changeState(SellPointState.FOR_SALE)) {
+      this._marker.label = `Seller: ${this._item?.seller.name}, price: ${this._item?.price}`
     }
   }
 
@@ -189,6 +205,4 @@ export default class SellPoint<TEntityMp extends EntityMp> {
 
   // TODO: remove from selling (clear the point only if state: FOR_SALE)
   // TODO: replace selling item (only if state: EMPTY)
-  // TODO: event - enterSellPoint
-  // TODO: event - exitSellPoint
 }
