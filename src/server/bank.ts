@@ -17,7 +17,7 @@ export default class Bank {
   static balance(player: PlayerMp): number {
     if (!this._isPlayerExists(player)) return 0;
 
-    return player.getVariable<number>('money') || 0;
+    return player.money || 0;
   }
 
   static withdraw(player: PlayerMp, amount: number): boolean {
