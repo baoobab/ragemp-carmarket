@@ -1,11 +1,21 @@
 ﻿// Singleton Bank class to perform money operations
 export default class Bank {
+  private static _instance: Bank;
+  private constructor() {} // Блокировка прямого создания
+
+  public static getInstance(): Bank {
+    if (!Bank._instance) {
+      Bank._instance = new Bank();
+    }
+    return Bank._instance;
+  }
+
   private static _isPlayerExists(player: PlayerMp): boolean {
-  return (!player || !mp.players.exists(player));
+  return player && mp.players.exists(player);
   }
 
   static balance(player: PlayerMp): number {
-    if (!this._isPlayerExists) return 0;
+    if (!this._isPlayerExists(player)) return 0;
 
     return player.getVariable<number>('money') || 0;
   }
@@ -19,7 +29,7 @@ export default class Bank {
   }
 
   static deposit(player: PlayerMp, amount: number): boolean {
-    if (!this._isPlayerExists) return false;
+    if (!this._isPlayerExists(player)) return false;
 
     player.money += amount; // Can takes from the cash var/etc
     return true
