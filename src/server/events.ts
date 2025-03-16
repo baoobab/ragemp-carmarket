@@ -4,9 +4,13 @@ import { carMarketsPool } from './custom-pools'
 
 
 mp.events.add('playerReady', (player) => {
+	if (!player || !mp.players.exists(player)) return;
 	// Set the custom variables defined in @types
-	
-	player.ownVehicles = []; // or get from DB/etc
+
+	player.ownVehicles = []; // or restore from DB/etc
+
+	// start balance on the bank account
+	player.money = 1000; // or restore from DB/etc
 });
 
 mp.events.add('playerDeath', (player) => {
