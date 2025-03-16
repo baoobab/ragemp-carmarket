@@ -1,10 +1,18 @@
-﻿import { Dimensions } from "@shared/constants";
+﻿import { CustomEntityType, Dimensions } from "@shared/constants";
 import InfoMarker from "./info-marker";
 import SellPoint from "./sell-point";
+
+
+export interface CarMarketCreation {
+  readonly position: Vector3;
+  readonly dimensions: Dimensions.Cuboid;
+  readonly dimension: number;
+}
 
 // CarMarket manages SellPoints and their visibility on the client
 export default class CarMarket {
   private _title: string = "Car Market"; // CarMarket title, shows on enter point
+  private _position: Vector3; // Center position
   private _colshape: ColshapeMp; // CarMarket zone
   private _sellPoints: SellPoint<VehicleMp>[] = []; // Points where player can sell/buy a vehicle
   private _enterPoint: InfoMarker; // Enter point to CarMarket, shows info
@@ -17,7 +25,10 @@ export default class CarMarket {
 
 
   // Generates default Market zone with Cuboid colshape, SellPoints on the 3 edges, and enterPoint on the last edge
-  constructor(position: Vector3, dimensions: Dimensions.Cuboid, dimension: number = 1) {
+  constructor(creationAttrs: CarMarketCreation) {
+    const {position, dimensions, dimension} = creationAttrs;
+    this._position = position
+
     // Paddings for sell points
     const BOUND_OFFSET = 5;
     const STEP = 5;
@@ -32,6 +43,8 @@ export default class CarMarket {
       dimensions.height,
       dimension,
     );
+    this._colshape.isForCustomEntityType = true;
+    this._colshape.customEntityType = CustomEntityType.CAR_MARKET;
   
     // CarMarket zone corners
     const upperLeft = new mp.Vector3(
@@ -100,6 +113,10 @@ export default class CarMarket {
   
   public get sellPoints() : SellPoint<VehicleMp>[] {
     return this._sellPoints
+  }
+
+  public get position() : Vector3 {
+    return this._position
   }
 
   // Signal onEnter - when player enters into Market _colshape
