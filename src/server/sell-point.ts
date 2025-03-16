@@ -1,4 +1,6 @@
 ﻿import InfoMarker from "./info-marker";
+import SaleItem from "./sale-item";
+
 
 export enum SellPointState {
   CLOSED, // When SellPoint closed by the admin/etc
@@ -9,10 +11,10 @@ export enum SellPointState {
 
 // SellPoint is place where a customer (player) can buy item, which this point is selling now
 // and a seller can create this point and put any item for sale on that
-export default class SellPoint {
+export default class SellPoint<TEntityMp extends EntityMp> {
   private _colshape: ColshapeMp; // Area where sell/buy operations affords
   private _marker: InfoMarker; // Only visual, for players
-  private _item: VehicleMp | undefined; // Vehicle for sale. Default is undefined
+  private _item: SaleItem <TEntityMp>| undefined; // Vehicle for sale. Default is undefined
   private _state: SellPointState = SellPointState.EMPTY; // Current state
 
   // Get color by current state
@@ -37,7 +39,6 @@ export default class SellPoint {
     position: Vector3, 
     title: string, 
     dimension: number = 1,
-    itemForSale?: VehicleMp,
   ) {
     this._colshape = mp.colshapes.newTube(
       position.x,
@@ -54,11 +55,15 @@ export default class SellPoint {
       title,
       dimension
     )
-
-
-    if (itemForSale) this._item = itemForSale;
   }
 
+  public placeForSale(itemForSale: TEntityMp, price: number, seller: PlayerMp) {
+    this._item = new SaleItem<TEntityMp>(itemForSale, price, seller);
+  }
+
+  // public buy(customer: PlayerMp) {
+    
+  // }
   
   public showFor(player: PlayerMp) {
     this._marker.showFor(player)
