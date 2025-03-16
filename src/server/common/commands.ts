@@ -163,6 +163,35 @@ mp.events.addCommand('buycar', (player: PlayerMp, _fullText) => {
 	}
 });
 
+/**
+ * Command to restore own car from the standing SellPoint.
+ *
+ * @param player The player who invoked the command.
+ */
+mp.events.addCommand('restorecar', (player: PlayerMp, _fullText) => {
+	// Car Market id updates on every leave/entry event, try take it
+	const targetCarMarketId = player.getVariable<number>('currentCarMarketColshapeId');
+	if (targetCarMarketId === null) {
+		return player.outputChatBox(`You can buy a vehicle only in the car market zone`);
+	}
+
+	// Car Market instance
+	const targetCarMarket = carMarketsPool.filter((market) => market.colshape.id === targetCarMarketId)[0];
+	// Sell Point instance from current Car Market
+	const sellPoint = targetCarMarket.sellPointByPosition(player.position);
+	if (sellPoint == null) {
+		return player.outputChatBox(`You should be on the sell point`);
+	}
+
+	// Logics
+
+	// Calls Sell Point to buy this item
+	if (sellPoint.restore(player)) {
+		player.outputChatBox(`Success!`);
+	} else {
+		player.outputChatBox(`Cannot restore`);
+	}
+});
 
 /**
  * Command to create a new cuboid colshape.
